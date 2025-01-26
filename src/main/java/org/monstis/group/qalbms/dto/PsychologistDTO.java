@@ -1,40 +1,48 @@
-package org.monstis.group.qalbms.domain;
+package org.monstis.group.qalbms.dto;
 
-import lombok.*;
-import org.elasticsearch.client.ElasticsearchClient;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
 
-
 @Data
-@Document(indexName = "psychologist")
-public class Psychologist  {
+@Getter
+@Setter
+public class PsychologistDTO {
 
-    @Id
-    private String id;
+
+
     private String firstName;
+
     private String lastName;
+
     private String age;
 
-    @Field(type = FieldType.Keyword)
-    private String videoUrl;
-
-    @Field(type = FieldType.Keyword)
+    @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @Field(type = FieldType.Keyword)
-    private String priceForSession;
-
-    @Field(type = FieldType.Keyword)
+    @JsonProperty("gender")
     private String gender;
 
+
+    @JsonProperty("video_url")
+    private String videoUrl;
+
+
+    @JsonProperty("price_for_session")
+    private String priceForSession;
+
+
     private List<PsychologicalIssue> psychoIssues;
+
     private List<PsychologicalApproach>psychologicalApproaches;
+
 
 }

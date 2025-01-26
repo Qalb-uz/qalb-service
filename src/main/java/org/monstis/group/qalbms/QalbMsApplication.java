@@ -6,11 +6,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import org.springframework.data.elasticsearch.repository.config.EnableReactiveElasticsearchRepositories;
 
 
 @SpringBootApplication(scanBasePackages = {"org.monstis.group.qalbms"})
 @EnableConfigurationProperties()
-@EnableElasticsearchRepositories
+@EnableReactiveElasticsearchRepositories
 @OpenAPIDefinition(info = @Info(title = "Qalb ms project", version = "${application.version}", description = "Qalb poject API documentation"))
 public class QalbMsApplication {
 

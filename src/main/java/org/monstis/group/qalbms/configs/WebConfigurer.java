@@ -41,4 +41,6 @@ public class WebConfigurer implements WebFluxConfigurer {
                 .baseUrl(eskizUrl)
                 .build();
     }
+
+
 }
