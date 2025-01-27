@@ -4,12 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.domain.Psychologist;
 import org.monstis.group.qalbms.repository.ElasticSearchRepository;
 import org.monstis.group.qalbms.service.SearchService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.client.erhlc.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
