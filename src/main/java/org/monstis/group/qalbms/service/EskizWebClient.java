@@ -22,11 +22,12 @@ public class EskizWebClient {
     public EskizWebClient(  WebClient eskizWebClient) {
         this.eskizWebClient = eskizWebClient;
     }
-    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 
     public Mono<EskizTokenDTO> getToken() {
-        formData.add("email", "jumayevsaid679@gmail.com");
-        formData.add("password", "Wnj9H19RztUDXA5L45gWLxXiETXHKjeLHlbBksg9");
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+        formData.add("email", "rizoabdusattarov@icloud.com");
+        formData.add("password", "PDCruGkMoqJ1FPwLG5Rib9CICQ7SFeTV0r9kyG13");
 
         log.info("Request to getToken from Eskiz");
                return eskizWebClient.post()
@@ -38,11 +39,15 @@ public class EskizWebClient {
     }
 
     public Mono<EskizResponseDTO> register(String phone, String token, int otp) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
         formData.add("mobile_phone", phone);
-        formData.add("message", "Это тест от Eskiz");
+        formData.add("message", "Код для верификации в сервисе Qalb.uz: " + otp);
         formData.add("from", "4546");
 
-        log.info("Eskiz request to  get OtpCode({})", phone);
+        log.info("Eskiz request to register phone({})", phone);
+        log.info("Eskiz request to  get OtpCode({})", otp);
+
         return eskizWebClient.post()
                 .uri("/message/sms/send")
                 .header("Authorization","Bearer "+ token)

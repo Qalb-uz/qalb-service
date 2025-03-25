@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.enums.Costs;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.monstis.group.qalbms.service.TheraphyService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("api")
 @Slf4j
