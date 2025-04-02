@@ -1,15 +1,13 @@
 package org.monstis.group.qalbms.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
+@Slf4j
 @Component
-
 public class OtpGenerator {
-    private static final Logger log = LoggerFactory.getLogger(OtpGenerator.class);
 
     public String generateOTP() {
         Random random = new Random();

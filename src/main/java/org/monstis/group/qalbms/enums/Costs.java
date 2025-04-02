@@ -8,10 +8,11 @@ public enum Costs {
     public final String costsInSom;
 
 
-    Costs( String costsInSom) {
+    Costs(String costsInSom) {
         this.costsInSom = costsInSom;
 
     }
+
     public String getCostsINSom() {
         return costsInSom;
     }

@@ -1,0 +1,70 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.7
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=Saidjumayev19980828
+      - xpack.security.enabled=true
+      - "ELASTIC_USERNAME=elastic"
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-u",
+          "elastic:Saidjumayev19980828",
+          "-f",
+          "http://localhost:9200",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+#  app:
+#    build: .
+#    container_name: qalb-service
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+#      postgres:
+#        condition: service_healthy
+#    environment:
+#      - SPRING_R2DBC_URL=r2dbc:postgresql://postgres:5432/postgres
+#      - SPRING_R2DBC_USERNAME=postgres
+#      - SPRING_R2DBC_PASSWORD=postgres
+#      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/postgres
+#      - SPRING_LIQUIBASE_USER=postgres
+#      - SPRING_LIQUIBASE_PASSWORD=postgres
+#      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+#      - SPRING_ELASTICSEARCH_USERNAME=elastic
+#      - SPRING_ELASTICSEARCH_PASSWORD=Saidjumayev19980828
+#    restart: on-failure
+
+volumes:
+  postgres-data:
+  elasticsearch-data:

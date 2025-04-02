@@ -6,9 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
 
@@ -16,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 public class PsychologistDTO {
-
 
 
     private String firstName;
@@ -42,7 +38,7 @@ public class PsychologistDTO {
 
     private List<PsychologicalIssue> psychoIssues;
 
-    private List<PsychologicalApproach>psychologicalApproaches;
+    private List<PsychologicalApproach> psychologicalApproaches;
 
 
 }

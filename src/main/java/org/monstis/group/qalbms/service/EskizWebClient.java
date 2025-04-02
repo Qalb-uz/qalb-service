@@ -1,9 +1,7 @@
 package org.monstis.group.qalbms.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.dto.EskizResponseDTO;
 import org.monstis.group.qalbms.dto.EskizTokenDTO;
-import org.monstis.group.qalbms.utils.OtpGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -16,10 +14,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class EskizWebClient {
 
-    private final WebClient eskizWebClient;
     private static final Logger log = LoggerFactory.getLogger(EskizWebClient.class);
+    private final WebClient eskizWebClient;
 
-    public EskizWebClient(  WebClient eskizWebClient) {
+    public EskizWebClient(WebClient eskizWebClient) {
         this.eskizWebClient = eskizWebClient;
     }
 
@@ -30,7 +28,7 @@ public class EskizWebClient {
         formData.add("password", "PDCruGkMoqJ1FPwLG5Rib9CICQ7SFeTV0r9kyG13");
 
         log.info("Request to getToken from Eskiz");
-               return eskizWebClient.post()
+        return eskizWebClient.post()
                 .uri("/auth/login") // Replace with your endpoint
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
@@ -38,7 +36,7 @@ public class EskizWebClient {
                 .bodyToMono(EskizTokenDTO.class);
     }
 
-    public Mono<EskizResponseDTO> register(String phone, String token, int otp) {
+    public Mono<EskizResponseDTO> register(String phone, String token, String otp) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 
         formData.add("mobile_phone", phone);
@@ -50,7 +48,7 @@ public class EskizWebClient {
 
         return eskizWebClient.post()
                 .uri("/message/sms/send")
-                .header("Authorization","Bearer "+ token)
+                .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
                 .retrieve()

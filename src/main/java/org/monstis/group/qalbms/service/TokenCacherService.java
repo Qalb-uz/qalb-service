@@ -27,6 +27,6 @@ public class TokenCacherService {
 
     public Optional<String> getToken(String username) {
         log.trace("GET token from caffeine cache: {}", username);
-        return Optional.ofNullable((String) this.tokenCache.getIfPresent(username));
+        return Optional.ofNullable(this.tokenCache.getIfPresent(username));
     }
 }

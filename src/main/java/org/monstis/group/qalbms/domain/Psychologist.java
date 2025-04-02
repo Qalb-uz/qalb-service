@@ -1,7 +1,6 @@
 package org.monstis.group.qalbms.domain;
 
-import lombok.*;
-import org.elasticsearch.client.ElasticsearchClient;
+import lombok.Data;
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.springframework.data.annotation.Id;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Data
 @Document(indexName = "psychologist")
-public class Psychologist  {
+public class Psychologist {
 
     @Id
     private String id;
@@ -35,6 +34,6 @@ public class Psychologist  {
     private String gender;
 
     private List<PsychologicalIssue> psychoIssues;
-    private List<PsychologicalApproach>psychologicalApproaches;
+    private List<PsychologicalApproach> psychologicalApproaches;
 
 }

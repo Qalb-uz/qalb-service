@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +18,7 @@ import java.util.stream.Stream;
 public class TheraphyImpl implements TheraphyService {
 
     @Override
-    public Mono<Map<String,String>> getKeyWords() {
+    public Mono<Map<String, String>> getKeyWords() {
         Map<String, String> functionalities = Arrays.stream(PsychologicalIssue.values())
                 .collect(Collectors.toMap(
                         issue -> issue.name(),  // Use the enum's name as the key
@@ -40,7 +38,7 @@ public class TheraphyImpl implements TheraphyService {
     }
 
     @Override
-    public Mono<Map<String,String >> getCosts() {
+    public Mono<Map<String, String>> getCosts() {
         Map<String, String> costsMap = Stream.of(Costs.values())
                 .collect(Collectors.toMap(Costs::name, Costs::getCostsINSom));
         return Mono.just(costsMap);

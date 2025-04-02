@@ -1,7 +1,7 @@
 package org.monstis.group.qalbms.service;
 
 
-import org.monstis.group.qalbms.domain.Auth;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -10,11 +10,11 @@ import java.util.Optional;
 @Service
 public interface AuthService {
 
-    Mono<?>verifyOtp(String otp);
+    Mono<?> verifyOtp(@NotNull String msisdn, @NotNull String otp);
 
-    Mono<?>registerPhone(String phone);
+    Mono<?> registerPhone(@NotNull String msisdn);
 
-    Mono<Optional<String>>setTokenToLocalCache();
+    Mono<Optional<String>> setTokenToLocalCache();
 
-    Mono<Optional<String>>getTokenFromLocalCache();
+    Mono<Optional<String>> getTokenFromLocalCache();
 }

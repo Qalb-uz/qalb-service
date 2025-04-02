@@ -23,5 +23,4 @@ public class SearchImpl implements SearchService {
     }
 
 
-
 }

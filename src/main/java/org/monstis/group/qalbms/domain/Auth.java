@@ -11,13 +11,13 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.io.Serializable;
 import java.time.Instant;
 
-@Accessors(chain = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value ="auth" )
-public class Auth implements Serializable
-{
+@Table(value = "auth")
+@Accessors(chain = true)
+public class Auth implements Serializable {
+
     @Id
     private Long id;
 
@@ -27,8 +27,6 @@ public class Auth implements Serializable
     @Column("phone_number")
     private String phoneNumber;
 
-
     @Column("created_at")
     private Instant createdAt;
-
 }

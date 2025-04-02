@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface AuthRepository extends R2dbcRepository<Auth,Long> {
+public interface AuthRepository extends R2dbcRepository<Auth, Long> {
 
-    Mono<Auth>findByOtpCode(String otpCode);
+    Mono<Auth> findByPhoneNumberAndOtpCode(String phoneNumber, String otpCode);
 
 }

@@ -6,8 +6,7 @@ import reactor.core.publisher.Flux;
 
 @Service
 public interface SearchService {
-    Flux<Psychologist>searchWithParams(String cost,String symptoms,String approach,String gender);
-
+    Flux<Psychologist> searchWithParams(String cost, String symptoms, String approach, String gender);
 
 
 }

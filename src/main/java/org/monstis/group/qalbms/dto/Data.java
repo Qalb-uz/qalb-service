@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 
 public class Data implements Serializable {
+    private String token;
+
     public String getToken() {
         return token;
     }
@@ -12,6 +14,4 @@ public class Data implements Serializable {
     public void setToken(String token) {
         this.token = token;
     }
-
-    private String token;
 }
