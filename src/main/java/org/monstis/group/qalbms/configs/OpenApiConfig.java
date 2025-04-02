@@ -11,7 +11,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .addServersItem(new Server().url("http://www.qalb.uz:8080/").description("Local server"))
+                .addServersItem(new Server().url("http://localhost:8080/").description("Local server"))
                 .addServersItem(new Server().url("https://api.example.com").description("Production server"));
     }
 }

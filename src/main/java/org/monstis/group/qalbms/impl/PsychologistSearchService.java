@@ -23,7 +23,7 @@ public class PsychologistSearchService {
     }
 
     public Mono<List<SearchHit<Psychologist>>> searchPsychologists(String gender, String priceForSession,
-                                                                   String psychologicalApproaches, String psychoIssues) {
+                                                                    String psychoIssues) {
         Criteria criteria = new Criteria();
 
         if (gender != null) {
@@ -32,9 +32,9 @@ public class PsychologistSearchService {
         if (priceForSession != null) {
             criteria = criteria.and("priceForSession").is(priceForSession);
         }
-        if (psychologicalApproaches != null) {
-            criteria = criteria.and("psychologicalApproaches").is(psychologicalApproaches);
-        }
+//        if (psychologicalApproaches != null) {
+//            criteria = criteria.and("psychologicalApproaches").is(psychologicalApproaches);
+//        }
         if (psychoIssues != null) {
             criteria = criteria.and("psychoIssues").is(psychoIssues);
         }

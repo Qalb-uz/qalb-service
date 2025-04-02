@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface AuthRepository extends R2dbcRepository<Auth,Long> {
 
-    Mono<Auth>findByOtpCode(String otpCode);
+    Mono<Auth>findByOtpCodeAndPhoneNumber(String otpCode,String phone);
 
 }

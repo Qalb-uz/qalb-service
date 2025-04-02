@@ -33,9 +33,8 @@ public class SearchController {
     @Operation(summary = "search for psychologs ", description = "REQUIRED_ROLES: <b></b>")
     public Mono<List<SearchHit<Psychologist>>> searchPsychologs(@RequestParam(required = false) String gender ,
                                                               @RequestParam(required = false) String priceForSession,
-                                                              @RequestParam(required = false) String psychologicalApproaches,
                                                               @RequestParam(required = false) String psychoIssues) {
-        return psychologistSearchService.searchPsychologists(gender, priceForSession, psychologicalApproaches, psychoIssues);
+        return psychologistSearchService.searchPsychologists(gender, priceForSession, psychoIssues);
 
     }
 }

@@ -44,6 +44,7 @@ public class EskizWebClient {
         formData.add("mobile_phone", phone);
         formData.add("message", "Код для верификации в сервисе Qalb.uz: " + otp);
         formData.add("from", "4546");
+        formData.add("callback_url","https://qalb.uz");
 
         log.info("Eskiz request to register phone({})", phone);
         log.info("Eskiz request to  get OtpCode({})", otp);
