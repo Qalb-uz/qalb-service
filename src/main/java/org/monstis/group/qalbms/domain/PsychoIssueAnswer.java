@@ -10,21 +10,21 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PsychoIssueAnswer {
-
     @Id
-    private Long id;
+    private String id;
 
-    private String category;
-    private String subcategory;
-    private String language;
-    private String answer;
-    private String phoneNumber;
+    private int topicId;
+    private String topicTitle;
 
-    public PsychoIssueAnswer(PsychoIssueAnswerDTO dto) {
-        this.category = dto.getCategory();
-        this.subcategory = dto.getSubcategory();
-        this.language = dto.getLanguage();
-        this.answer = dto.getAnswer();
-        this.phoneNumber = dto.getPhoneNumber();
+    private int subtopicId;
+    private String subtopicTitle;
+
+    public PsychoIssueAnswer(int topicId, String topicTitle, int subtopicId, String subtopicTitle) {
+        this.topicId = topicId;
+        this.topicTitle = topicTitle;
+        this.subtopicId = subtopicId;
+        this.subtopicTitle = subtopicTitle;
     }
+
+    // Getters/Setters
 }
