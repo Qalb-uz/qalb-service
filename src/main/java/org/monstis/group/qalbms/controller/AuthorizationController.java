@@ -32,7 +32,7 @@ public class AuthorizationController {
 
     @PostMapping("/verify-otp")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    private Mono<?>verifyOtp(@RequestParam("otp") String otp,@RequestParam("otp") String phone) {
+    private Mono<?>verifyOtp(@RequestParam("otp") String otp,@RequestParam("phone") String phone) {
         return authService.verifyOtp(otp,phone).flatMap(Mono::just);
     }
 

@@ -3,8 +3,12 @@ package org.monstis.group.qalbms.impl;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.monstis.group.qalbms.domain.Auth;
 import org.monstis.group.qalbms.dto.OtpResponse;
+import org.monstis.group.qalbms.dto.TokenResponse;
 import org.monstis.group.qalbms.repository.AuthRepository;
 import org.monstis.group.qalbms.service.AuthService;
 import org.monstis.group.qalbms.service.EskizWebClient;
@@ -45,13 +49,28 @@ public class AuthImpl implements AuthService {
 
     @Override
     public Mono<?> verifyOtp(String otp,String phone) {
-        return authRepository.findByOtpCodeAndPhoneNumber(otp,phone).flatMap(auth -> {
+        return authRepository.findByOtpCodeAndPhoneNumber(DigestUtils.sha256Hex(otp),phone).flatMap(auth -> {
             if(!Instant.now().isAfter(auth.getCreatedAt().plusSeconds(60))){
-                return Mono.just(auth);
+
+                return authenticate(otp,phone);
             }else{
                 return Mono.just(("OTP code is expired "));
             }
         });
+    }
+    public Mono<TokenResponse> authenticate(String otp,String phone) {
+        log.info(" Process get Token for {}: ", phone);
+        Keycloak keycloak = KeycloakBuilder.builder().serverUrl("http://23.239.18.240:9999").realm("qalb-project").clientId("qalb_client")
+                .clientSecret("P9YCw0ovEEWIfpkyL0BL3pTESCZ6vawQ").username("998997960298").password("test")
+                .grantType(OAuth2Constants.PASSWORD).build();
+
+        String accessToken = keycloak.tokenManager().getAccessToken().getToken();
+        Long expiresIn = keycloak.tokenManager().getAccessToken().getExpiresIn();
+        String refreshToken = keycloak.tokenManager().getAccessToken().getRefreshToken();
+        Long refreshExpiresIn = keycloak.tokenManager().getAccessToken().getRefreshExpiresIn();
+        TokenResponse tokenResponse = new TokenResponse(accessToken, expiresIn, refreshToken, refreshExpiresIn);
+
+        return Mono.just(tokenResponse);
     }
 
     @Override
