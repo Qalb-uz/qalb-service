@@ -60,8 +60,8 @@ public class AuthImpl implements AuthService {
     }
     public Mono<TokenResponse> authenticate(String otp,String phone) {
         log.info(" Process get Token for {}: ", phone);
-        Keycloak keycloak = KeycloakBuilder.builder().serverUrl("http://23.239.18.240:9999").realm("qalb-project").clientId("qalb_client")
-                .clientSecret("P9YCw0ovEEWIfpkyL0BL3pTESCZ6vawQ").username("998997960298").password("test")
+        Keycloak keycloak = KeycloakBuilder.builder().serverUrl("http://23.239.18.240:9999").realm("master").clientId("qalb_client")
+                .clientSecret("sc3PHomz5qiRhgmy6AKMvo5ISqYk72uy").username("998997960298").password("test")
                 .grantType(OAuth2Constants.PASSWORD).build();
 
         String accessToken = keycloak.tokenManager().getAccessToken().getToken();

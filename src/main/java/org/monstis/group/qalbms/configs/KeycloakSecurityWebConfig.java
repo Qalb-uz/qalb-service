@@ -26,7 +26,7 @@ public class KeycloakSecurityWebConfig {
 				.authorizeExchange(exchange -> exchange.pathMatchers("/admin/**").hasRole("ADMIN")
 						.pathMatchers("/user/**").hasRole("USER").pathMatchers("/partner/**").hasRole("CLIENT")
 						.pathMatchers("/api/v1/auth/refresh-token","/api/register/**","/api/verify-otp/**").permitAll()
-						.pathMatchers("/swagger-ui/**","swagger-ui/index.html","v1/api-docs/**", "/api-docs/**", "/swagger-resources/**", "/webjars/**")
+						.pathMatchers("/swagger-ui/**","/v3/api-docs","swagger-ui.html","v1/api-docs/**", "/api-docs/**", "/swagger-resources/**", "/webjars/**")
 						.permitAll()
 						.anyExchange().authenticated())
 				.oauth2ResourceServer(
