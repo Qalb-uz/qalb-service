@@ -25,7 +25,7 @@ public class KeycloakSecurityWebConfig {
 		http.csrf(ServerHttpSecurity.CsrfSpec::disable)
 				.authorizeExchange(exchange -> exchange.pathMatchers("/admin/**").hasRole("ADMIN")
 						.pathMatchers("/user/**").hasRole("USER")
-						.pathMatchers("/api/v1/auth/refresh-token","webjars/swagger-ui/index.html","/api/register/**","/api/verify-otp/**").permitAll()
+						.pathMatchers("/api/v1/auth/refresh-token","webjars/swagger-ui/index.html","v1/swagger-ui/index.html","/api/register/**","/api/verify-otp/**").permitAll()
 						.pathMatchers("/swagger-ui/**","/v3/api-docs/**","swagger-ui.html","v1/api-docs/**", "/api-docs/**", "/swagger-resources/**", "/webjars/**")
 						.permitAll()
 						.anyExchange().authenticated())
