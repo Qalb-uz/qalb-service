@@ -33,7 +33,7 @@ public class PsychoIssueController {
                         answers.add(new PsychoIssueAnswer(
                                 topic.getId(),
                                 topic.getTitle(),
-                                sub.getId(),
+                                sub.getAdditional(),
                                 sub.getTitle()
                         ));
                     }
@@ -56,15 +56,12 @@ public class PsychoIssueController {
                         );
 
                         SubtopicDTO subtopic = new SubtopicDTO(
-                                answer.getSubtopicId(),
                                 answer.getSubtopicTitle()
                         );
 
                         // avoid duplicates
                         List<SubtopicDTO> subtopics = topicMap.get(answer.getTopicId()).getSubtopics();
-                        if (subtopics.stream().noneMatch(s -> s.getId() == subtopic.getId())) {
-                            subtopics.add(subtopic);
-                        }
+
                     }
 
                     return Flux.fromIterable(topicMap.values());

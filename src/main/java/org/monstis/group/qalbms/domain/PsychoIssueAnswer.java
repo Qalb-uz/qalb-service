@@ -16,13 +16,13 @@ public class PsychoIssueAnswer {
     private int topicId;
     private String topicTitle;
 
-    private int subtopicId;
     private String subtopicTitle;
+    private String additional;
 
-    public PsychoIssueAnswer(int topicId, String topicTitle, int subtopicId, String subtopicTitle) {
+    public PsychoIssueAnswer(int topicId, String topicTitle, String additional, String subtopicTitle) {
         this.topicId = topicId;
         this.topicTitle = topicTitle;
-        this.subtopicId = subtopicId;
+        this.additional=additional;
         this.subtopicTitle = subtopicTitle;
     }
 
