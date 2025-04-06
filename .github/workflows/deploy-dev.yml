@@ -1,0 +1,80 @@
+name: Deploy to Dev Server
+
+# Trigger the workflow on push events to the 'dev' branch
+on:
+  push:
+    branches:
+      - dev # Change this if your development branch has a different name
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest # Specifies the runner environment for the Actions job itself
+
+    steps:
+      - name: Checkout code # Checks out the code in the runner (optional but good practice)
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@master # Popular action for SSH commands
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # port: 22 # Optional: Uncomment and change if your SSH port is different
+          script: |
+            # Navigate to the project directory on the server
+            echo "Navigating to project directory..."
+            cd ${{ secrets.PROJECT_PATH_ON_SERVER }}
+            if [ $? -ne 0 ]; then echo "Failed to navigate to project directory"; exit 1; fi
+
+            # Ensure we are on the correct branch
+            echo "Checking out dev branch..."
+            git checkout dev
+            if [ $? -ne 0 ]; then echo "Failed to checkout dev branch"; exit 1; fi
+
+            # Pull the latest changes from the dev branch
+            echo "Pulling latest changes..."
+            git pull origin dev
+            if [ $? -ne 0 ]; then echo "Failed to pull changes"; exit 1; fi
+
+            # Build Docker images on the server
+            echo "Building Docker image on the server..."
+            docker build --platform linux/amd64 -t tenxegineer/qalb-service:dev .
+            if [ $? -ne 0 ]; then echo "Docker build failed"; exit 1; fi
+
+            # Zero-downtime deployment strategy
+            echo "Performing zero-downtime deployment..."
+
+            # Get the current container ID if it exists
+            CURRENT_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
+
+            # Create a unique name for the new container
+            NEW_CONTAINER_NAME="qalb-service-$(date +%s)"
+
+            # Start the new container
+            echo "Starting new container: $NEW_CONTAINER_NAME..."
+            docker-compose -f docker-compose.yml up -d --no-deps --scale qalb-service=1 --no-recreate --renew-anon-volumes
+            if [ $? -ne 0 ]; then echo "Failed to start new container"; exit 1; fi
+
+            # Wait for the new container to be healthy (adjust as needed)
+            echo "Waiting for new container to be ready..."
+            sleep 10
+
+            # Check if the new container is running
+            if ! docker ps | grep -q $NEW_CONTAINER_NAME; then
+              echo "New container failed to start properly"; exit 1;
+            fi
+
+            # If we had a previous container, stop it
+            if [ ! -z "$CURRENT_CONTAINER" ]; then
+              echo "Stopping old container..."
+              docker stop $CURRENT_CONTAINER
+              docker rm $CURRENT_CONTAINER
+            fi
+
+            # Optional: Clean up dangling Docker images (images without tags)
+            echo "Cleaning up dangling images..."
+            docker image prune -f
+
+            echo "Deployment successful!"
