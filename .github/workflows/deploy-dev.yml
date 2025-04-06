@@ -12,9 +12,6 @@ jobs:
     runs-on: ubuntu-latest # Specifies the runner environment for the Actions job itself
 
     steps:
-      - name: Checkout code # Checks out the code in the runner (optional but good practice)
-        uses: actions/checkout@v4
-
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@master # Popular action for SSH commands
         with:
@@ -23,40 +20,37 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           # port: 22 # Optional: Uncomment and change if your SSH port is different
           script: |
-            # Get repository name from GitHub context
-            REPO_NAME="${GITHUB_REPOSITORY#*/}"
+            # Navigate to the project directory on the server
+            echo "Navigating to project directory..."
+            cd ${{ secrets.PROJECT_PATH_ON_SERVER }}
+            if [ $? -ne 0 ]; then echo "Failed to navigate to project directory"; exit 1; fi
 
-            # Store the parent directory path and the repo directory name
-            PARENT_DIR=$(dirname ${{ secrets.PROJECT_PATH_ON_SERVER }})
-            REPO_DIR=$(basename ${{ secrets.PROJECT_PATH_ON_SERVER }})
-
-            # Navigate to the parent directory
-            echo "Navigating to parent directory..."
-            cd $PARENT_DIR
-            if [ $? -ne 0 ]; then echo "Failed to navigate to parent directory"; exit 1; fi
-
-            # Save current timestamp for backup directory name
-            TIMESTAMP=$(date +%Y%m%d%H%M%S)
-
-            # If the repo directory exists, rename it as a backup
-            if [ -d "$REPO_DIR" ]; then
-              echo "Creating backup of current repository..."
-              mv $REPO_DIR ${REPO_DIR}_backup_${TIMESTAMP}
-            fi
-
-            # Clone the repository fresh
-            echo "Cloning fresh repository..."
-            git clone https://github.com/${{ github.repository }}.git $REPO_DIR
-            if [ $? -ne 0 ]; then echo "Failed to clone repository"; exit 1; fi
-
-            # Navigate to the newly cloned repository
-            cd $REPO_DIR
-            if [ $? -ne 0 ]; then echo "Failed to navigate to repository directory"; exit 1; fi
-
-            # Checkout the dev branch
+            # Ensure we are on the correct branch
             echo "Checking out dev branch..."
             git checkout dev
             if [ $? -ne 0 ]; then echo "Failed to checkout dev branch"; exit 1; fi
+
+            # Stash any local changes
+            echo "Stashing any local changes..."
+            git stash
+
+            # Set Git to use HTTPS instead of SSH if needed
+            echo "Configuring git remote..."
+            REMOTE_URL=$(git config --get remote.origin.url)
+            if [[ $REMOTE_URL == *"git@github.com"* ]]; then
+              REPO_NAME=$(echo $REMOTE_URL | sed 's/.*github.com://g' | sed 's/\.git//g')
+              git remote set-url origin https://github.com/${REPO_NAME}.git
+            fi
+
+            # Pull the latest changes from the dev branch
+            echo "Pulling latest changes..."
+            git fetch --all
+            git reset --hard origin/dev
+            if [ $? -ne 0 ]; then echo "Failed to pull changes"; exit 1; fi
+
+            # Update submodules if any
+            echo "Updating submodules..."
+            git submodule update --init --recursive
 
             # Build Docker images on the server
             echo "Building Docker image on the server..."
@@ -94,9 +88,5 @@ jobs:
             # Optional: Clean up dangling Docker images (images without tags)
             echo "Cleaning up dangling images..."
             docker image prune -f
-
-            # Remove old backups older than 7 days
-            echo "Cleaning up old backups..."
-            find $PARENT_DIR -name "${REPO_DIR}_backup_*" -type d -mtime +7 -exec rm -rf {} \;
 
             echo "Deployment successful!"
