@@ -33,6 +33,12 @@ jobs:
             git checkout dev
             if [ $? -ne 0 ]; then echo "Failed to checkout dev branch"; exit 1; fi
 
+            # Fix the remote URL issue - change from HTTPS to SSH
+            echo "Configuring git remote to use SSH instead of HTTPS..."
+            REPO_NAME=$(git config --get remote.origin.url | sed 's/.*github.com\///g' | sed 's/\.git$//g')
+            git remote set-url origin git@github.com:${REPO_NAME}.git
+            if [ $? -ne 0 ]; then echo "Failed to update remote URL"; exit 1; fi
+
             # Pull the latest changes from the dev branch
             echo "Pulling latest changes..."
             git pull origin dev
