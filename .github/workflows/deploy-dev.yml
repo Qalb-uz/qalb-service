@@ -23,38 +23,45 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           # port: 22 # Optional: Uncomment and change if your SSH port is different
           script: |
-            # Navigate to the project directory on the server
-            echo "Navigating to project directory..."
-            cd ${{ secrets.PROJECT_PATH_ON_SERVER }}
-            if [ $? -ne 0 ]; then echo "Failed to navigate to project directory"; exit 1; fi
+            # Get repository name from GitHub context
+            REPO_NAME="${GITHUB_REPOSITORY#*/}"
 
-            # Ensure we are on the correct branch
+            # Store the parent directory path and the repo directory name
+            PARENT_DIR=$(dirname ${{ secrets.PROJECT_PATH_ON_SERVER }})
+            REPO_DIR=$(basename ${{ secrets.PROJECT_PATH_ON_SERVER }})
+
+            # Navigate to the parent directory
+            echo "Navigating to parent directory..."
+            cd $PARENT_DIR
+            if [ $? -ne 0 ]; then echo "Failed to navigate to parent directory"; exit 1; fi
+
+            # Save current timestamp for backup directory name
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+
+            # If the repo directory exists, rename it as a backup
+            if [ -d "$REPO_DIR" ]; then
+              echo "Creating backup of current repository..."
+              mv $REPO_DIR ${REPO_DIR}_backup_${TIMESTAMP}
+            fi
+
+            # Clone the repository fresh
+            echo "Cloning fresh repository..."
+            git clone https://github.com/${{ github.repository }}.git $REPO_DIR
+            if [ $? -ne 0 ]; then echo "Failed to clone repository"; exit 1; fi
+
+            # Navigate to the newly cloned repository
+            cd $REPO_DIR
+            if [ $? -ne 0 ]; then echo "Failed to navigate to repository directory"; exit 1; fi
+
+            # Checkout the dev branch
             echo "Checking out dev branch..."
             git checkout dev
             if [ $? -ne 0 ]; then echo "Failed to checkout dev branch"; exit 1; fi
 
-            # Fix the remote URL issue - change from HTTPS to SSH
-            echo "Configuring git remote to use SSH instead of HTTPS..."
-            REPO_NAME=$(git config --get remote.origin.url | sed 's/.*github.com\///g' | sed 's/\.git$//g')
-            git remote set-url origin git@github.com:${REPO_NAME}.git
-            if [ $? -ne 0 ]; then echo "Failed to update remote URL"; exit 1; fi
-
-            # Add GitHub's SSH host key to known_hosts
-            echo "Adding GitHub's SSH host key to known_hosts..."
-            mkdir -p ~/.ssh
-            touch ~/.ssh/known_hosts
-            ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-            if [ $? -ne 0 ]; then echo "Failed to add GitHub's host key"; exit 1; fi
-
-            # Pull the latest changes from the dev branch
-            echo "Pulling latest changes..."
-            git pull origin dev
-            if [ $? -ne 0 ]; then echo "Failed to pull changes"; exit 1; fi
-
             # Build Docker images on the server
             echo "Building Docker image on the server..."
             docker build --platform linux/amd64 -t tenxegineer/qalb-service:dev .
-            if [ $? -ne 0 ]; then echo "Docker build failed"; exit 1; fi
+            if [ $? -ne 0 ]; then echo "Failed to build Docker image"; exit 1; fi
 
             # Zero-downtime deployment strategy
             echo "Performing zero-downtime deployment..."
@@ -62,11 +69,8 @@ jobs:
             # Get the current container ID if it exists
             CURRENT_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
 
-            # Create a unique name for the new container
-            NEW_CONTAINER_NAME="qalb-service-$(date +%s)"
-
             # Start the new container
-            echo "Starting new container: $NEW_CONTAINER_NAME..."
+            echo "Starting new container..."
             docker-compose -f docker-compose.yml up -d --no-deps --scale qalb-service=1 --no-recreate --renew-anon-volumes
             if [ $? -ne 0 ]; then echo "Failed to start new container"; exit 1; fi
 
@@ -75,12 +79,13 @@ jobs:
             sleep 10
 
             # Check if the new container is running
-            if ! docker ps | grep -q $NEW_CONTAINER_NAME; then
+            NEW_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
+            if [ -z "$NEW_CONTAINER" ]; then
               echo "New container failed to start properly"; exit 1;
             fi
 
-            # If we had a previous container, stop it
-            if [ ! -z "$CURRENT_CONTAINER" ]; then
+            # If we had a previous container and it's different from the new one, stop it
+            if [ ! -z "$CURRENT_CONTAINER" ] && [ "$CURRENT_CONTAINER" != "$NEW_CONTAINER" ]; then
               echo "Stopping old container..."
               docker stop $CURRENT_CONTAINER
               docker rm $CURRENT_CONTAINER
@@ -89,5 +94,9 @@ jobs:
             # Optional: Clean up dangling Docker images (images without tags)
             echo "Cleaning up dangling images..."
             docker image prune -f
+
+            # Remove old backups older than 7 days
+            echo "Cleaning up old backups..."
+            find $PARENT_DIR -name "${REPO_DIR}_backup_*" -type d -mtime +7 -exec rm -rf {} \;
 
             echo "Deployment successful!"
