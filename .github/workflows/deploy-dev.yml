@@ -12,119 +12,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: false # Disable submodule checkout
-
-      - name: Create deployment archive
-        run: |
-          tar -czf deployment.tar.gz --exclude='.git' --exclude='node_modules' .
-          ls -la deployment.tar.gz
-
-      - name: Check server access and directories
+      - name: Deploy using SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Check if directory exists and permissions
-            echo "Checking target directory..."
-            if [ ! -d "/var/www" ]; then
-              echo "Error: /var/www directory doesn't exist"
-              exit 1
-            fi
-
-            # Check write permissions
-            if [ ! -w "/var/www" ]; then
-              echo "Error: No write permission to /var/www"
-              echo "Current permissions:"
-              ls -ld /var/www
-              echo "Current user: $(whoami)"
-              exit 1
-            fi
-
-            # Create qalb-service directory if it doesn't exist
-            if [ ! -d "/var/www/qalb-service" ]; then
-              echo "Creating qalb-service directory..."
-              mkdir -p /var/www/qalb-service
-            fi
-
-            # Ensure we have permission to write to it
-            if [ ! -w "/var/www/qalb-service" ]; then
-              echo "Error: No write permission to /var/www/qalb-service"
-              exit 1
-            fi
-
-            echo "Directory checks passed"
-
-      - name: Transfer files to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deployment.tar.gz"
-          target: "/var/www"
-
-      - name: Deploy on server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www
-
-            # Extract files to qalb-service directory
-            echo "Extracting deployment files..."
-            tar -xzf deployment.tar.gz -C qalb-service
-            if [ $? -ne 0 ]; then echo "Failed to extract files"; exit 1; fi
-
-            # Cleanup the archive
-            rm deployment.tar.gz
-
             # Navigate to project directory
-            cd qalb-service
-            if [ $? -ne 0 ]; then echo "Failed to navigate to project directory"; exit 1; fi
+            cd /var/www/qalb-service
+            if [ $? -ne 0 ]; then
+              echo "Directory doesn't exist, creating..."
+              mkdir -p /var/www/qalb-service
+              cd /var/www/qalb-service
+              git clone https://github.com/Qalb-uz/qalb-service.git .
+            fi
 
-            # Build Docker images on the server
-            echo "Building Docker image on the server..."
+            # Make sure we're on dev branch
+            git checkout dev
+
+            # Pull latest changes
+            echo "Pulling latest changes..."
+            git pull origin dev
+
+            # Build Docker image
+            echo "Building Docker image..."
             docker build --platform linux/amd64 -t tenxegineer/qalb-service:dev .
-            if [ $? -ne 0 ]; then echo "Failed to build Docker image"; exit 1; fi
 
-            # Zero-downtime deployment strategy
-            echo "Performing zero-downtime deployment..."
-
-            # Get the current container ID if it exists
+            # Get current container ID if it exists
             CURRENT_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
 
-            # Start the new container
-            echo "Starting new container..."
-            docker-compose -f docker-compose.yml up -d --no-deps --scale qalb-service=1 --no-recreate --renew-anon-volumes
-            if [ $? -ne 0 ]; then echo "Failed to start new container"; exit 1; fi
+            # Start new container with docker-compose
+            echo "Starting container..."
+            docker-compose up -d
 
-            # Wait for the new container to be healthy (adjust as needed)
-            echo "Waiting for new container to be ready..."
-            sleep 10
+            # Wait for new container to be ready
+            echo "Waiting for container to be ready..."
+            sleep 5
 
-            # Check if the new container is running
+            # Verify container is running
             NEW_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
             if [ -z "$NEW_CONTAINER" ]; then
-              echo "New container failed to start properly"; exit 1;
+              echo "Container failed to start"
+              exit 1
             fi
 
-            # If we had a previous container and it's different from the new one, stop it
-            if [ ! -z "$CURRENT_CONTAINER" ] && [ "$CURRENT_CONTAINER" != "$NEW_CONTAINER" ]; then
-              echo "Stopping old container..."
-              docker stop $CURRENT_CONTAINER
-              docker rm $CURRENT_CONTAINER
-            fi
-
-            # Optional: Clean up dangling Docker images (images without tags)
-            echo "Cleaning up dangling images..."
+            # Clean up
+            echo "Cleaning up..."
             docker image prune -f
 
             echo "Deployment successful!"
