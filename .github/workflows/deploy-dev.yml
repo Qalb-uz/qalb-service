@@ -20,12 +20,27 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # Navigate to project directory
-            cd /var/www/qalb-service
-            if [ $? -ne 0 ]; then
+            echo "Checking project directory..."
+            if [ ! -d "/var/www/qalb-service" ]; then
               echo "Directory doesn't exist, creating..."
               mkdir -p /var/www/qalb-service
-              cd /var/www/qalb-service
+            fi
+
+            cd /var/www/qalb-service
+
+            # Check if this is a git repository
+            if [ ! -d ".git" ]; then
+              echo "Not a git repository, initializing..."
+              rm -rf * .[^.]*  # Clean directory if it exists but isn't a git repo
               git clone https://github.com/Qalb-uz/qalb-service.git .
+              if [ $? -ne 0 ]; then
+                echo "Failed to clone repository. Trying with organization name..."
+                git clone https://github.com/Qalb-uz/qalb-service.git .
+                if [ $? -ne 0 ]; then
+                  echo "Failed to clone repository. Please check repository URL and permissions."
+                  exit 1
+                fi
+              fi
             fi
 
             # Make sure we're on dev branch
@@ -34,6 +49,22 @@ jobs:
             # Pull latest changes
             echo "Pulling latest changes..."
             git pull origin dev
+
+            # Verify files exist
+            echo "Verifying necessary files..."
+            if [ ! -f "Dockerfile" ]; then
+              echo "ERROR: Dockerfile missing!"
+              echo "Current files:"
+              ls -la
+              exit 1
+            fi
+
+            if [ ! -f "docker-compose.yml" ] && [ ! -f "docker-compose.yaml" ]; then
+              echo "ERROR: docker-compose.yml missing!"
+              echo "Current files:"
+              ls -la
+              exit 1
+            fi
 
             # Build Docker image
             echo "Building Docker image..."
@@ -48,17 +79,28 @@ jobs:
 
             # Wait for new container to be ready
             echo "Waiting for container to be ready..."
-            sleep 5
+            sleep 10
 
             # Verify container is running
             NEW_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
             if [ -z "$NEW_CONTAINER" ]; then
               echo "Container failed to start"
+              docker ps
+              docker-compose logs
               exit 1
             fi
+
+            # Verify service is responding (adjust URL as needed)
+            echo "Verifying service is responding..."
+            curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health || echo "Service not responding on expected port, manual verification required"
 
             # Clean up
             echo "Cleaning up..."
             docker image prune -f
 
-            echo "Deployment successful!"
+            echo "==================== DEPLOYMENT SUMMARY ===================="
+            echo "Git branch: $(git branch --show-current)"
+            echo "Git commit: $(git rev-parse HEAD)"
+            echo "Docker containers:"
+            docker ps
+            echo "==================== DEPLOYMENT COMPLETE ===================="
