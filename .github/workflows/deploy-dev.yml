@@ -9,80 +9,86 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest # Specifies the runner environment for the Actions job itself
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Server via SSH
-        uses: appleboy/ssh-action@master # Popular action for SSH commands
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: "recursive"
+
+      - name: Create deployment archive
+        run: |
+          tar -czf deployment.tar.gz --exclude='.git' --exclude='node_modules' .
+          ls -la deployment.tar.gz
+
+      - name: Check server access and directories
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # port: 22 # Optional: Uncomment and change if your SSH port is different
           script: |
-            # Print diagnostic information
-            echo "Current directory: $(pwd)"
-            echo "Home directory: $HOME"
-            echo "Listing home directory:"
-            ls -la $HOME
-
-            # Check if the project directory exists
-            PROJ_DIR="${{ secrets.PROJECT_PATH_ON_SERVER }}"
-            echo "Checking if project directory exists: $PROJ_DIR"
-
-            if [ ! -d "$PROJ_DIR" ]; then
-              echo "Project directory does not exist. Creating it..."
-              mkdir -p "$PROJ_DIR"
-
-              # Clone the repository if directory was created
-              echo "Cloning repository..."
-              git clone https://github.com/${{ github.repository }}.git "$PROJ_DIR"
-              if [ $? -ne 0 ]; then
-                # Try with SSH if HTTPS fails
-                echo "HTTPS clone failed, trying SSH..."
-                git clone git@github.com:${{ github.repository }}.git "$PROJ_DIR"
-                if [ $? -ne 0 ]; then
-                  echo "Failed to clone repository. Please check your repository URL and permissions."
-                  exit 1
-                fi
-              fi
+            # Check if directory exists and permissions
+            echo "Checking target directory..."
+            if [ ! -d "/var/www" ]; then
+              echo "Error: /var/www directory doesn't exist"
+              exit 1
             fi
 
-            # Navigate to the project directory on the server
-            echo "Navigating to project directory..."
-            cd "$PROJ_DIR"
+            # Check write permissions
+            if [ ! -w "/var/www" ]; then
+              echo "Error: No write permission to /var/www"
+              echo "Current permissions:"
+              ls -ld /var/www
+              echo "Current user: $(whoami)"
+              exit 1
+            fi
+
+            # Create qalb-service directory if it doesn't exist
+            if [ ! -d "/var/www/qalb-service" ]; then
+              echo "Creating qalb-service directory..."
+              mkdir -p /var/www/qalb-service
+            fi
+
+            # Ensure we have permission to write to it
+            if [ ! -w "/var/www/qalb-service" ]; then
+              echo "Error: No write permission to /var/www/qalb-service"
+              exit 1
+            fi
+
+            echo "Directory checks passed"
+
+      - name: Transfer files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "deployment.tar.gz"
+          target: "/var/www"
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www
+
+            # Extract files to qalb-service directory
+            echo "Extracting deployment files..."
+            tar -xzf deployment.tar.gz -C qalb-service
+            if [ $? -ne 0 ]; then echo "Failed to extract files"; exit 1; fi
+
+            # Cleanup the archive
+            rm deployment.tar.gz
+
+            # Navigate to project directory
+            cd qalb-service
             if [ $? -ne 0 ]; then echo "Failed to navigate to project directory"; exit 1; fi
-
-            # Print directory contents
-            echo "Project directory contents:"
-            ls -la
-
-            # Ensure we are on the correct branch
-            echo "Checking out dev branch..."
-            git checkout dev
-            if [ $? -ne 0 ]; then echo "Failed to checkout dev branch"; exit 1; fi
-
-            # Stash any local changes
-            echo "Stashing any local changes..."
-            git stash
-
-            # Set Git to use HTTPS instead of SSH if needed
-            echo "Configuring git remote..."
-            REMOTE_URL=$(git config --get remote.origin.url)
-            if [[ $REMOTE_URL == *"git@github.com"* ]]; then
-              REPO_NAME=$(echo $REMOTE_URL | sed 's/.*github.com://g' | sed 's/\.git//g')
-              git remote set-url origin https://github.com/${REPO_NAME}.git
-            fi
-
-            # Pull the latest changes from the dev branch
-            echo "Pulling latest changes..."
-            git fetch --all
-            git reset --hard origin/dev
-            if [ $? -ne 0 ]; then echo "Failed to pull changes"; exit 1; fi
-
-            # Update submodules if any
-            echo "Updating submodules..."
-            git submodule update --init --recursive
 
             # Build Docker images on the server
             echo "Building Docker image on the server..."
