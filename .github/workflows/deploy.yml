@@ -42,7 +42,7 @@ jobs:
             if [ -z "$NEW_CONTAINER" ]; then
             echo "Container failed to start"
             curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
-                -d chat_id="${TELEGRAM_TO}" \
+                -d chat_id="${{ TELEGRAM_TO }}" \
                 -d text="Container failed to start"
             exit 1
             fi
@@ -51,5 +51,5 @@ jobs:
             docker image prune -f
             echo "Deployment successful!"
             curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
-                -d chat_id="${TELEGRAM_TO}" \
+                -d chat_id="${{ TELEGRAM_TO }}" \
                 -d text="Deployment successful!"
