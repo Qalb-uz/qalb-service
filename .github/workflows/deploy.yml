@@ -31,9 +31,9 @@ jobs:
             echo "Pulling latest changes..."
             git pull origin dev-adk
 
-            # Start new container with docker-compose
+            # Start new container with docker compose
             echo "Starting container..."
-            docker-compose up --build -d
+            docker compose up --build -d
             # Wait for new container to be ready
             echo "Waiting for container to be ready..."
             sleep 5
