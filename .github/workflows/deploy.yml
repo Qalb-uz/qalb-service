@@ -15,4 +15,41 @@ jobs:
           host: ${{ secrets.CONTABO_SSH_SERVER }}
           username: ${{ secrets.CONTABO_SSH_USER }}
           key: ${{ secrets.CONTABO_SSH_PRIVATE_KEY }}
-          script: cd ~/ && ./runner.sh
+          script: |
+            # Navigate to project directory
+            cd qalb-service
+            if [ $? -ne 0 ]; then
+            echo "Directory doesn't exist, creating..."
+            mkdir -p qalb-service
+            cd qalb-service
+            git clone git clone https://oauth2:${{ secrets.GIT_TOKEN }}@github.com/Qalb-uz/qalb-service.git .
+            fi
+
+            # Make sure we're on correct branch
+            git checkout dev-adk
+            # Pull latest changes
+            echo "Pulling latest changes..."
+            git pull origin dev-adk
+
+            # Start new container with docker-compose
+            echo "Starting container..."
+            docker-compose up --build -d
+            # Wait for new container to be ready
+            echo "Waiting for container to be ready..."
+            sleep 5
+            # Verify container is running
+            NEW_CONTAINER=$(docker ps --filter "name=qalb-service" -q)
+            if [ -z "$NEW_CONTAINER" ]; then
+            echo "Container failed to start"
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+                -d chat_id="${TELEGRAM_TO}" \
+                -d text="Container failed to start"
+            exit 1
+            fi
+            # Clean up
+            echo "Cleaning up..."
+            docker image prune -f
+            echo "Deployment successful!"
+            curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+                -d chat_id="${TELEGRAM_TO}" \
+                -d text="Deployment successful!"
