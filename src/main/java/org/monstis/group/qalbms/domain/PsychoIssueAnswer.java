@@ -15,7 +15,7 @@ public class PsychoIssueAnswer {
 
     private int topicId;
     private String topicTitle;
-
+    private String username;
     private String subtopicTitle;
     private String additional;
 
