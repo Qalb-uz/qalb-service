@@ -11,7 +11,7 @@ services:
     ports:
       - "9200:9200"
     volumes:
-      - ./elasticsearch-data:/usr/share/elasticsearch/data
+      - ./elasticsearch-data:/var/lib/elasticsearch/data
     healthcheck:
       test:
         [
