@@ -16,11 +16,11 @@ jobs:
 
       - name: Add remote server to known_hosts
         run: |
-          ssh-keyscan ${{CONTABO_SSH_USER}}@${{CONTABO_SSH_SERVER}} >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ secrets.CONTABO_SSH_USER }}@${{ secrets.CONTABO_SSH_SERVER }} >> ~/.ssh/known_hosts
 
       - name: Deploy to server
         run: |
-          ssh ${{CONTABO_SSH_USER}}@${{CONTABO_SSH_SERVER}} << 'EOF'
-          cd ${{CONTABO_PROJECT_PATH}}
+          ssh ${{ secrets.CONTABO_SSH_USER }}@${{ secrets.CONTABO_SSH_SERVER }} << 'EOF'
+          cd ${{ secrets.CONTABO_PROJECT_PATH }}
           ./runner.sh  
           EOF
