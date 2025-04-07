@@ -68,10 +68,10 @@ public class PsychoIssueController {
                 });
     }
 
-    @GetMapping("check-client-application")
-    public Mono<TopicDTO> checkClientApplication() {
-        answerRepository.fi
-
-    }
+//    @GetMapping("check-client-application")
+//    public Mono<TopicDTO> checkClientApplication() {
+//        answerRepository.fi
+//
+//    }
 
 } 
