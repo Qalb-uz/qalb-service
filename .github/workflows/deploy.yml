@@ -22,7 +22,7 @@ jobs:
             echo "Directory doesn't exist, creating..."
             mkdir -p qalb-service
             cd qalb-service
-            git clone git clone https://oauth2:${{ secrets.GIT_TOKEN }}@github.com/Qalb-uz/qalb-service.git .
+            git clone https://oauth2:${{ secrets.GIT_TOKEN }}@github.com/Qalb-uz/qalb-service.git .
             fi
 
             # Make sure we're on correct branch
