@@ -39,9 +39,9 @@ public class KeycloakSecurityWebConfig {
 	public ReactiveJwtDecoder jwtDecoder() {
 
 		NimbusReactiveJwtDecoder jwtDecoder = (NimbusReactiveJwtDecoder) ReactiveJwtDecoders
-				.fromOidcIssuerLocation("https://23.239.18.240:8444/realms/master");
+				.fromOidcIssuerLocation("http://23.239.18.240:9999/realms/master");
 
-		OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer("https://23.239.18.240:8444/realms/master");
+		OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer("http://23.239.18.240:9999/realms/master");
 		jwtDecoder.setJwtValidator(withIssuer);
 
 		return jwtDecoder;

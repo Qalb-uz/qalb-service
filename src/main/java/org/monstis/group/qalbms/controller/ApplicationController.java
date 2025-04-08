@@ -1,14 +1,15 @@
 package org.monstis.group.qalbms.controller;
 
 
+import jakarta.ws.rs.core.HttpHeaders;
 import lombok.RequiredArgsConstructor;
 import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
-import org.monstis.group.qalbms.dto.PsychoIssueAnswerDTO;
 import org.monstis.group.qalbms.dto.SubtopicDTO;
 import org.monstis.group.qalbms.dto.TopicDTO;
 import org.monstis.group.qalbms.repository.PsychoIssueAnswerRepository;
-import org.springframework.http.ResponseEntity;
+import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,13 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/issues")
+@RequestMapping("/api/application")
 @RequiredArgsConstructor
-public class PsychoIssueController {
+public class ApplicationController {
 
     private final PsychoIssueAnswerRepository answerRepository;
+    private final JwtUtil jwtUtil;
 
-    @PostMapping("/answers")
+    @PostMapping("/send")
     public Mono<Void> saveAnswers(@RequestBody Flux<TopicDTO> topicsFlux) {
         return topicsFlux
                 .flatMap(topic -> {
@@ -43,7 +45,7 @@ public class PsychoIssueController {
     }
 
 
-    @GetMapping("/answers")
+    @GetMapping("/get")
     public Flux<TopicDTO> getAllAnswers() {
         return answerRepository.findAll()
                 .collectList()
@@ -68,10 +70,12 @@ public class PsychoIssueController {
                 });
     }
 
-//    @GetMapping("check-client-application")
-//    public Mono<TopicDTO> checkClientApplication() {
-//        answerRepository.fi
-//
-//    }
+    @GetMapping("check-client-application")
+    public Mono<PsychoIssueAnswer> checkClientApplication(ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            String token = authHeader.substring(7);
+       return answerRepository.findByUsername(jwtUtil.getUsername(token)).switchIfEmpty(Mono.error(new Error("Client Application Not Found")));
+
+    }
 
 } 

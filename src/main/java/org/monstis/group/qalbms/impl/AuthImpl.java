@@ -10,6 +10,7 @@ import org.monstis.group.qalbms.domain.Auth;
 import org.monstis.group.qalbms.dto.OtpResponse;
 import org.monstis.group.qalbms.dto.TokenResponse;
 import org.monstis.group.qalbms.repository.AuthRepository;
+import org.monstis.group.qalbms.repository.PsychoIssueAnswerRepository;
 import org.monstis.group.qalbms.service.AuthService;
 import org.monstis.group.qalbms.service.EskizWebClient;
 import org.monstis.group.qalbms.service.KeycloakService;
@@ -36,17 +37,19 @@ public class AuthImpl implements AuthService {
    private final OtpGenerator otpGenerator;
    private final AuthRepository authRepository;
    private final KeycloakService keycloakService;
+   private final PsychoIssueAnswerRepository psychoIssueAnswerRepository;
 
    @Value("${eskiz.username.token}")
    private String eskizUsernameToken;
 
-    public AuthImpl(UzbekistanPhoneNumberValidator uzbPhoneNumberValidator, EskizWebClient eskizWebClient, TokenCacherService tokenCacherService, OtpGenerator otpGenerator, AuthRepository authRepository, KeycloakService keycloakService) {
+    public AuthImpl(UzbekistanPhoneNumberValidator uzbPhoneNumberValidator, EskizWebClient eskizWebClient, TokenCacherService tokenCacherService, OtpGenerator otpGenerator, AuthRepository authRepository, KeycloakService keycloakService, PsychoIssueAnswerRepository psychoIssueAnswerRepository) {
         this.uzbPhoneNumberValidator = uzbPhoneNumberValidator;
         this.eskizWebClient = eskizWebClient;
         this.tokenCacherService = tokenCacherService;
         this.otpGenerator = otpGenerator;
         this.authRepository = authRepository;
         this.keycloakService = keycloakService;
+        this.psychoIssueAnswerRepository = psychoIssueAnswerRepository;
     }
 
 

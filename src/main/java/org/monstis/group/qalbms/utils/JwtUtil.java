@@ -1,11 +1,13 @@
 package org.monstis.group.qalbms.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 
+@Component
 public class JwtUtil {
-    public static String getUsername(String jwtToken) {
+    public  String getUsername(String jwtToken) {
         try {
             String[] chunks = jwtToken.split("\\.");
             String payload = new String(Base64.getUrlDecoder().decode(chunks[1]));
