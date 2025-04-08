@@ -12,6 +12,7 @@ import org.monstis.group.qalbms.dto.TokenResponse;
 import org.monstis.group.qalbms.repository.AuthRepository;
 import org.monstis.group.qalbms.service.AuthService;
 import org.monstis.group.qalbms.service.EskizWebClient;
+import org.monstis.group.qalbms.service.KeycloakService;
 import org.monstis.group.qalbms.service.TokenCacherService;
 import org.monstis.group.qalbms.utils.OtpGenerator;
 import org.monstis.group.qalbms.utils.UzbekistanPhoneNumberValidator;
@@ -34,16 +35,18 @@ public class AuthImpl implements AuthService {
    private final TokenCacherService tokenCacherService;
    private final OtpGenerator otpGenerator;
    private final AuthRepository authRepository;
+   private final KeycloakService keycloakService;
 
    @Value("${eskiz.username.token}")
    private String eskizUsernameToken;
 
-    public AuthImpl(UzbekistanPhoneNumberValidator uzbPhoneNumberValidator, EskizWebClient eskizWebClient, TokenCacherService tokenCacherService, OtpGenerator otpGenerator, AuthRepository authRepository) {
+    public AuthImpl(UzbekistanPhoneNumberValidator uzbPhoneNumberValidator, EskizWebClient eskizWebClient, TokenCacherService tokenCacherService, OtpGenerator otpGenerator, AuthRepository authRepository, KeycloakService keycloakService) {
         this.uzbPhoneNumberValidator = uzbPhoneNumberValidator;
         this.eskizWebClient = eskizWebClient;
         this.tokenCacherService = tokenCacherService;
         this.otpGenerator = otpGenerator;
         this.authRepository = authRepository;
+        this.keycloakService = keycloakService;
     }
 
 
@@ -52,7 +55,9 @@ public class AuthImpl implements AuthService {
         return authRepository.findByOtpCodeAndPhoneNumber(DigestUtils.sha256Hex(otp),phone).flatMap(auth -> {
             if(!Instant.now().isAfter(auth.getCreatedAt().plusSeconds(60))){
 
-                return authenticate(otp,phone);
+                return keycloakService.getAccessToken()
+                        .flatMap(s -> keycloakService.createUser(s, phone)
+                                .flatMap(s1 -> keycloakService.setUserPassword(s, s1, otp)));
             }else{
                 return Mono.just(("OTP code is expired "));
             }
