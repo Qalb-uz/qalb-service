@@ -1,11 +1,15 @@
-# Use OpenJDK as base image
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17-jdk as build
+WORKDIR /workspace/app
 
-# Set the working directory
-WORKDIR /app
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
 
-# Copy your JAR into the container
-COPY qalb-service.jar app.jar
+RUN chmod +x mvnw
+RUN ./mvnw clean package -DskipTests
 
-# Run the JAR
-ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM eclipse-temurin:17-jre
+VOLUME /tmp
+COPY --from=build /workspace/app/target/*.jar app.jar
+ENTRYPOINT ["java","-jar","/app
