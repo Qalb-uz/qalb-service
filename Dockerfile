@@ -12,4 +12,4 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:17-jre
 VOLUME /tmp
 COPY --from=build /workspace/app/target/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app
+ENTRYPOINT ["java","-jar","/app"]
