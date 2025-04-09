@@ -20,6 +20,15 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("My WebFlux API")
                         .description("This is a sample API using WebFlux and OpenAPI")
-                        .version("1.0"));
+                        .version("1.0")).components(new Components()
+                        .addSecuritySchemes("bearer-key",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        ))
+                .addSecurityItem(new SecurityRequirement().addList("bearer-key")).servers(List.of(
+                        new Server().url("https://localhost:8080").description("Local HTTPS")
+                ));
     }
 }

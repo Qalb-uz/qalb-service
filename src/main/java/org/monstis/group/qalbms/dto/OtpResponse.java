@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class OtpResponse implements Serializable {
     private String message;
     private String phone;
-    private String anketaId;
+
 
 
     public OtpResponse(String otp_sent_successfully, String phone) {
