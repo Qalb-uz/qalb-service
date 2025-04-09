@@ -13,18 +13,16 @@ public class PsychoIssueAnswer {
     @Id
     private String id;
 
-    private int topicId;
     private String topicTitle;
     private String username;
     private String subtopicTitle;
     private String additional;
 
-    public PsychoIssueAnswer(int topicId, String topicTitle, String additional, String subtopicTitle) {
-        this.topicId = topicId;
+    public PsychoIssueAnswer( String topicTitle, String additional, String subtopicTitle,String username) {
         this.topicTitle = topicTitle;
         this.additional=additional;
         this.subtopicTitle = subtopicTitle;
+        this.username = username;
     }
 
-    // Getters/Setters
 }
