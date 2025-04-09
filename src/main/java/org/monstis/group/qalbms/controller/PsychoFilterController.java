@@ -46,7 +46,7 @@ public class PsychoFilterController {
 
     @GetMapping("/cost")
     @Operation(summary = "cost for session", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<Map<String, Map<String, String>>> getCost() {
+    public Mono<List<Map<String, String>>> getCost() {
         return theraphyService.getCosts();
     }
 }

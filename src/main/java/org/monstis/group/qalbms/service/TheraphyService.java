@@ -15,5 +15,5 @@ public interface TheraphyService {
 
     Mono<Map<String,String>>getApproach();
 
-    Mono<Map<String, Map<String, String>>>getCosts();
+    Mono<List<Map<String, String>>>getCosts();
 }

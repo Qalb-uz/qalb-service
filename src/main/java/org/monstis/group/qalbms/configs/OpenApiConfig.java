@@ -28,7 +28,7 @@ public class OpenApiConfig {
                                         .bearerFormat("JWT")
                         ))
                 .addSecurityItem(new SecurityRequirement().addList("bearer-key")).servers(List.of(
-                        new Server().url("https://524b-194-93-25-212.ngrok-free.app").description("Local HTTPS")
+                        new Server().url("https://api.qalb.uz").description("Local HTTPS")
                 ));
     }
 }

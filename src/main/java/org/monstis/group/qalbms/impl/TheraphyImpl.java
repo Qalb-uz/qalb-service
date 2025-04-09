@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,20 +41,20 @@ public class TheraphyImpl implements TheraphyService {
     }
 
     @Override
-    public Mono<Map<String, Map<String, String>>> getCosts() {
-        Map<String, Map<String, String>> costsMap = Stream.of(Costs.values())
-                .collect(Collectors.toMap(
-                        Costs::name,
-                        cost -> {
-                            Map<String, String> data = new HashMap<>();
-                            data.put("costsInSom", cost.getCostsINSom());
-                            data.put("experience", cost.getExperience());
-                            data.put("subtitle", cost.getSubtitle());
-                            return data;
-                        }
-                ));
+    public Mono<List<Map<String, String>>> getCosts() {
+        List<Map<String, String>> costsList = Stream.of(Costs.values())
+                .map(cost -> {
+                    Map<String, String> data = new HashMap<>();
+                    data.put("title", cost.name());
+                    data.put("costsInSom", cost.getCostsINSom());
+                    data.put("subtitle", cost.getSubtitle());
+                    data.put("experience", cost.getExperience());
+                    return data;
+                })
+                .collect(Collectors.toList());
 
-        return Mono.just(costsMap);
+        return Mono.just(costsList);
     }
+
 
 }
