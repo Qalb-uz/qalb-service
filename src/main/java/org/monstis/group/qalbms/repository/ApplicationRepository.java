@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ApplicationRepository extends ReactiveCrudRepository<PsychoIssueAnswer, Long> {
 
-    Mono<TopicDTO> findFirstByUsername(String username);
+    Mono<PsychoIssueAnswer> findFirstByUsername(String username);
 
     Mono<PsychoIssueAnswer>save(TopicDTO topicDTO);
 }

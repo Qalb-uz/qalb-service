@@ -28,7 +28,7 @@ public class OpenApiConfig {
                                         .bearerFormat("JWT")
                         ))
                 .addSecurityItem(new SecurityRequirement().addList("bearer-key")).servers(List.of(
-                        new Server().url("https://api.qalb.uz").description("Local HTTPS")
+                        new Server().url("localhost:8080").description("Local HTTPS")
                 ));
     }
 }

@@ -9,7 +9,9 @@ import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
 import org.monstis.group.qalbms.dto.TopicDTO;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.utils.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +51,7 @@ public class ApplicationController {
                     return Mono.just("Client application valid");
                 }
            return Mono.just((psychoIssueAnswer));
-       }).switchIfEmpty(Mono.error(new Error("Client Application Not Found")));
+       }).switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT, "Client application not found")));
 
     }
 

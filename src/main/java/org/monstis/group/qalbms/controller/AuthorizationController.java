@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.monstis.group.qalbms.domain.Auth;
 import org.monstis.group.qalbms.dto.OtpResponse;
+import org.monstis.group.qalbms.dto.TokenResponse;
 import org.monstis.group.qalbms.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -32,7 +32,7 @@ public class AuthorizationController {
 
     @PostMapping("/verify-otp")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    private Mono<?>verifyOtp(@RequestParam("otp") String otp,@RequestParam("phone") String phone) {
+    private Mono<TokenResponse>verifyOtp(@RequestParam("otp") String otp, @RequestParam("phone") String phone) {
         return authService.verifyOtp(otp,phone).flatMap(Mono::just);
     }
 

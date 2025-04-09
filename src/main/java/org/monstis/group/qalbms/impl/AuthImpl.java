@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.monstis.group.qalbms.domain.Auth;
 import org.monstis.group.qalbms.dto.OtpResponse;
+import org.monstis.group.qalbms.dto.TokenResponse;
 import org.monstis.group.qalbms.repository.AuthRepository;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.service.AuthService;
@@ -52,13 +53,14 @@ public class AuthImpl implements AuthService {
 
 
     @Override
-    public Mono<String> verifyOtp(String otp,String phone) {
+    public Mono<TokenResponse> verifyOtp(String otp, String phone) {
         return authRepository.findByOtpCodeAndPhoneNumber(DigestUtils.sha256Hex(otp),phone).flatMap(auth -> {
             if(!Instant.now().isAfter(auth.getCreatedAt().plusSeconds(60))){
             JwtUtil jwtUtil1 = new JwtUtil();
-                return Mono.just(jwtUtil1.generateToken(auth.getPhoneNumber()));
+            TokenResponse tokenResponse=new TokenResponse(jwtUtil1.generateToken(auth.getPhoneNumber()),3600l,null,null);
+                return Mono.just(tokenResponse);
             }else{
-                return Mono.just(("OTP code is expired "));
+                return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP expired"));
             }
         });
     }

@@ -48,4 +48,9 @@ public class PsychoIssueAnswer {
         this.subtopics = subtopics;
         this.username = username;
     }
+
+    public boolean isValid() {
+        return  title != null && !title.trim().isEmpty() && subtopics != null && !subtopics.isEmpty()&& !cost.isEmpty()
+                && !therapyFor.isEmpty()&& !firstName.isEmpty()&& !theraphyLanguage.isEmpty();
+    }
 }
