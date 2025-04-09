@@ -2,6 +2,7 @@ package org.monstis.group.qalbms.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.enums.Costs;
+
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.monstis.group.qalbms.service.TheraphyService;
@@ -9,8 +10,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

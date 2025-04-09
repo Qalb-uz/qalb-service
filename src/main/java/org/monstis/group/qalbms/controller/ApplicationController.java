@@ -1,12 +1,13 @@
 package org.monstis.group.qalbms.controller;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
-import org.monstis.group.qalbms.dto.SubtopicDTO;
 import org.monstis.group.qalbms.dto.TopicDTO;
-import org.monstis.group.qalbms.repository.PsychoIssueAnswerRepository;
+import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
@@ -14,46 +15,47 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/application")
 @RequiredArgsConstructor
 public class ApplicationController {
 
-    private final PsychoIssueAnswerRepository answerRepository;
+    private final ApplicationRepository applicationRepository;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/send")
-    public Flux<PsychoIssueAnswer> saveAnswers(@RequestBody Flux<TopicDTO> topicsFlux,ServerWebExchange exchange) {
-        return topicsFlux
-                .flatMap(topic -> {
-                    String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-                    String token = authHeader.substring(7);
-                   String username=jwtUtil.extractUsername(token);
-                    List<PsychoIssueAnswer> answers = new ArrayList<>();
-                    for (SubtopicDTO sub : topic.getSubtopics()) {
-                        answers.add(new PsychoIssueAnswer(
-                                topic.getTitle(),
-                                sub.getAdditional(),
-                                sub.getTitle(),
-                                username
-                        ));
-                    }
-                    return answerRepository.saveAll(answers).flatMap(Flux::just);
-                });
+    public Mono<PsychoIssueAnswer> saveAnswers(@RequestBody List<PsychoIssueAnswer> topicsList, ServerWebExchange exchange) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
 
+        topicsList.forEach(topicDTO -> topicDTO.setUsername(username));
+
+        return applicationRepository.saveAll(topicsList)
+                .next();
     }
 
 
+
     @GetMapping("check-client-application")
-    public Mono<PsychoIssueAnswer> checkClientApplication(ServerWebExchange exchange) {
+    public Mono<?> checkClientApplication(ServerWebExchange exchange) {
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             String token = authHeader.substring(7);
-       return answerRepository.findFirstByUsername(jwtUtil.extractUsername(token)).switchIfEmpty(Mono.error(new Error("Client Application Not Found")));
+             return applicationRepository.findFirstByUsername(jwtUtil.extractUsername(token)).flatMap(psychoIssueAnswer -> {
+                if(psychoIssueAnswer.isValid())
+                {
+                    return Mono.just("Client application valid");
+                }
+           return Mono.just((psychoIssueAnswer));
+       }).switchIfEmpty(Mono.error(new Error("Client Application Not Found")));
 
+    }
+
+    @PutMapping("edit-client-application")
+    public Mono<?>editClientApplication(@RequestBody TopicDTO topicsFlux) {
+        return applicationRepository.save(topicsFlux);
     }
 
 } 

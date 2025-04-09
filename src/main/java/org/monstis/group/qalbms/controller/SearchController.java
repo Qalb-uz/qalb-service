@@ -31,7 +31,7 @@ public class SearchController {
 
     @PostMapping("/search")
     @Operation(summary = "search for psychologs ", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<List<SearchHit<Psychologist>>> searchPsychologs(@RequestParam(required = false) String gender ,
+    public Mono<List<Psychologist>> searchPsychologs(@RequestParam(required = false) String gender ,
                                                               @RequestParam(required = false) String priceForSession,
                                                               @RequestParam(required = false) String psychoIssues) {
         return psychologistSearchService.searchPsychologists(gender, priceForSession, psychoIssues);

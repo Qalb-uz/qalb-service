@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Getter
 @Setter
 public class PsychologistDTO {
-
 
 
     private String firstName;
@@ -34,6 +34,9 @@ public class PsychologistDTO {
 
     @JsonProperty("video_url")
     private String videoUrl;
+
+    @JsonProperty("psycho_calendar")
+    private Map<String,String> psychoCalendar;
 
 
     @JsonProperty("price_for_session")

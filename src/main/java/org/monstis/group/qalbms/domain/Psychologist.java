@@ -1,7 +1,6 @@
 package org.monstis.group.qalbms.domain;
 
 import lombok.*;
-import org.elasticsearch.client.ElasticsearchClient;
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.springframework.data.annotation.Id;
@@ -10,6 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Data
@@ -24,6 +24,10 @@ public class Psychologist  {
 
     @Field(type = FieldType.Keyword)
     private String videoUrl;
+
+
+    @Field(type = FieldType.Keyword)
+    private Map<String,String> psychoCalendar;
 
     @Field(type = FieldType.Keyword)
     private String phoneNumber;

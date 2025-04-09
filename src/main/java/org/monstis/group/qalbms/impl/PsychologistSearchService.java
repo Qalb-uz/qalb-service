@@ -22,8 +22,8 @@ public class PsychologistSearchService {
         this.reactiveElasticsearchTemplate = reactiveElasticsearchTemplate;
     }
 
-    public Mono<List<SearchHit<Psychologist>>> searchPsychologists(String gender, String priceForSession,
-                                                                    String psychoIssues) {
+    public Mono<List<Psychologist>> searchPsychologists(String gender, String priceForSession, String psychoIssues) {
+
         Criteria criteria = new Criteria();
 
         if (gender != null) {
@@ -32,19 +32,18 @@ public class PsychologistSearchService {
         if (priceForSession != null) {
             criteria = criteria.and("priceForSession").is(priceForSession);
         }
-//        if (psychologicalApproaches != null) {
-//            criteria = criteria.and("psychologicalApproaches").is(psychologicalApproaches);
-//        }
         if (psychoIssues != null) {
             criteria = criteria.and("psychoIssues").is(psychoIssues);
         }
 
         Query query = new CriteriaQuery(criteria);
-        // Use PageRequest for pagination if needed
-        PageRequest pageRequest = PageRequest.of(0, 10); // Example: page 0, size 10
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
         query.setPageable(pageRequest);
 
         return reactiveElasticsearchTemplate.search(query, Psychologist.class)
-                .collectList(); // Collect results into a list
+                .map(SearchHit::getContent)
+                .collectList();
     }
+
 }
