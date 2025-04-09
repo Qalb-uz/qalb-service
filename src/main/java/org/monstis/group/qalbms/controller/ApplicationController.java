@@ -42,9 +42,7 @@ public class ApplicationController {
                                 username
                         ));
                     }
-                    return answerRepository.saveAll(answers).flatMap(psychoIssueAnswer -> {
-                        return Flux.just(psychoIssueAnswer);
-                    });
+                    return answerRepository.saveAll(answers).flatMap(Flux::just);
                 });
 
     }

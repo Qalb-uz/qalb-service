@@ -8,5 +8,11 @@ import java.io.Serializable;
 public class CommonResponse implements Serializable {
 
     private Cause cause;
+
+    public CommonResponse(Cause cause, Boolean success) {
+        this.cause = cause;
+        this.success = success;
+    }
+
     private Boolean success;
 }
