@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,9 +40,20 @@ public class TheraphyImpl implements TheraphyService {
     }
 
     @Override
-    public Mono<Map<String,String >> getCosts() {
-        Map<String, String> costsMap = Stream.of(Costs.values())
-                .collect(Collectors.toMap(Costs::name, Costs::getCostsINSom));
+    public Mono<Map<String, Map<String, String>>> getCosts() {
+        Map<String, Map<String, String>> costsMap = Stream.of(Costs.values())
+                .collect(Collectors.toMap(
+                        Costs::name,
+                        cost -> {
+                            Map<String, String> data = new HashMap<>();
+                            data.put("costsInSom", cost.getCostsINSom());
+                            data.put("experience", cost.getExperience());
+                            data.put("subtitle", cost.getSubtitle());
+                            return data;
+                        }
+                ));
+
         return Mono.just(costsMap);
     }
+
 }
