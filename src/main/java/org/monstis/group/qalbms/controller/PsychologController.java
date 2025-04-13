@@ -5,11 +5,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.domain.Psychologist;
-import org.monstis.group.qalbms.dto.ElkaResponse;
+import org.monstis.group.qalbms.dto.ContentDTO;
+import org.monstis.group.qalbms.dto.ContentForAllDTO;
 import org.monstis.group.qalbms.dto.PsychologistDTO;
 import org.monstis.group.qalbms.service.PsychologistService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +36,7 @@ public class PsychologController {
 
     @GetMapping("/get/all-psychologs")
     @Operation(summary = "add psychologs", description = "REQUIRED_ROLES: <b></b>")
-    public Flux<PsychologistDTO> getAllPsychologs() {
+    public Mono<ContentDTO> getAllPsychologs() {
         return psychologistService.getAllPsychologyist();
     }
 

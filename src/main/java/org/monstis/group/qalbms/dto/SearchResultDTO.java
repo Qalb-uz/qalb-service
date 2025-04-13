@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchResultDTO {
-
-   private Integer count;
-   private String prevKey;
-   private String nextKey;
+    
     private TherapistDTO therapist;
     private AdditionalInfoDTO additionalInfo;
     private LicenseDTO license;

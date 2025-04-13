@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.monstis.group.qalbms.domain.Auth;
 import org.monstis.group.qalbms.domain.Client;
-import org.monstis.group.qalbms.dto.OtpResponse;
-import org.monstis.group.qalbms.dto.TokenResponse;
-import org.monstis.group.qalbms.dto.VerifyDTO;
+import org.monstis.group.qalbms.domain.Psychologist;
+import org.monstis.group.qalbms.dto.*;
+import org.monstis.group.qalbms.enums.Gender;
 import org.monstis.group.qalbms.repository.AuthRepository;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.repository.ClientRepository;
@@ -19,6 +19,10 @@ import org.monstis.group.qalbms.utils.OtpGenerator;
 import org.monstis.group.qalbms.utils.TypedResponseException;
 import org.monstis.group.qalbms.utils.UzbekistanPhoneNumberValidator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -136,7 +140,16 @@ public class AuthImpl implements AuthService {
                                 auth.setOtpCode(hashOTP(otp)); // Hash OTP before storing
                                 auth.setCreatedAt(Instant.now());
                                 auth.setDeviceId(deviceId);
-                                return clientRepository.findByDeviceIdAndMsisdn(deviceId, phone).flatMap(exClient -> {
+                                return clientRepository.findByDeviceIdAndMsisdn(deviceId, phone).switchIfEmpty(Mono.defer(() -> {
+                                    log.info("No client found for deviceId: {} and phone: {}. Creating new client.", deviceId, phone);  // Added log
+                                    Client client = new Client();
+                                    client.setMsisdn(phone);
+                                    client.setDeviceName(deviceName);
+                                    client.setDeviceId(deviceId);
+                                    client.setFirstLoginAt(Instant.now());
+                                    client.setResumeStatus(String.valueOf(VerifyDTO.ResumeStatus.INVALID));
+                                    return clientRepository.save(client);
+                                })).flatMap(exClient -> {
                                     exClient.setMsisdn(phone);
                                     exClient.setDeviceName(deviceName);
                                     exClient.setDeviceId(deviceId);

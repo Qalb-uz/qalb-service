@@ -4,17 +4,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
-import org.monstis.group.qalbms.domain.Psychologist;
+import org.monstis.group.qalbms.dto.ContentDTO;
+import org.monstis.group.qalbms.dto.ContentForAllDTO;
 import org.monstis.group.qalbms.dto.PagenationData;
-import org.monstis.group.qalbms.dto.PsychologistDTO;
-import org.monstis.group.qalbms.dto.SearchResultDTO;
 import org.monstis.group.qalbms.impl.PsychologistSearchService;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.service.PsychologistService;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
@@ -39,17 +37,22 @@ public class SearchController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "search for psychologs", description = "REQUIRED_ROLES: <b></b>")
-    public Flux<?> searchPsychologs(@RequestParam("apply_filter") Boolean filter, ServerWebExchange exchange, @RequestBody PagenationData pageData) {
+    @Operation(summary = "search for psychologists", description = "REQUIRED_ROLES: <b></b>")
+    public Mono<ContentDTO> searchPsychologists(
+            @RequestParam("apply_filter") Boolean filter,
+            ServerWebExchange exchange,
+            @RequestBody PagenationData pageData
+    ) {
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);
 
         if (!filter) {
-            return psychologistService.getAllPsychologyist(); // already returns Flux
+            return psychologistService.getAllPsychologyist();
         }
+
         return applicationRepository.findFirstByUsername(username)
-                .flatMapMany(psychoIssueAnswer ->
+                .flatMap(psychoIssueAnswer ->
                         psychologistSearchService.searchPsychologists(
                                 psychoIssueAnswer.getPsychoGender(),
                                 psychoIssueAnswer.getCost(),
@@ -59,6 +62,8 @@ public class SearchController {
                         )
                 );
     }
+
+
 
 
 }

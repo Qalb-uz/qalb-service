@@ -7,12 +7,11 @@ import org.monstis.group.qalbms.enums.Gender;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.monstis.group.qalbms.repository.ElasticSearchRepository;
 import org.monstis.group.qalbms.service.PsychologistService;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -73,32 +72,42 @@ public class PsychologsImpl implements PsychologistService {
 
 
     @Override
-    public Flux<PsychologistDTO> getAllPsychologyist() {
-        return (elasticSearchRepository.findAll().flatMap(psychologist -> {
-            PsychologistDTO psychologistDTO = new PsychologistDTO();
-            TherapistDTO therapistDTO = new TherapistDTO();
-            therapistDTO.setFirstName(psychologist.getFirstName());
-            therapistDTO.setLastName(psychologist.getLastName());
-            therapistDTO.setGender(Gender.valueOf(psychologist.getGender()));
-            therapistDTO.setPriceForSession(psychologist.getPriceForSession());
-            therapistDTO.setPhoneNumber(psychologist.getPhoneNumber());
-            therapistDTO.setPriceForSession(psychologist.getPriceForSession());
+    public Mono<ContentDTO> getAllPsychologyist() {
+        return elasticSearchRepository.findAll()
+                .map(psychologist -> {
+                    SearchResultDTO psychologistDTO = new SearchResultDTO();
 
-            AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-            additionalInfoDTO.setSubtitle(psychologist.getAdditionalInfoSubtitle());
-            additionalInfoDTO.setTitle(psychologist.getAdditionalInfoTitle());
+                    TherapistDTO therapistDTO = new TherapistDTO();
+                    therapistDTO.setFirstName(psychologist.getFirstName());
+                    therapistDTO.setLastName(psychologist.getLastName());
+                    therapistDTO.setGender(Gender.valueOf(psychologist.getGender()));
+                    therapistDTO.setPriceForSession(psychologist.getPriceForSession());
+                    therapistDTO.setPhoneNumber(psychologist.getPhoneNumber());
 
-            LicenseDTO licenseDTO = new LicenseDTO();
-            licenseDTO.setDocUrl(psychologist.getLicenseDocUrl());
-            licenseDTO.setTitle(psychologist.getLicenseTitle());
+                    AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
+                    additionalInfoDTO.setSubtitle(psychologist.getAdditionalInfoSubtitle());
+                    additionalInfoDTO.setTitle(psychologist.getAdditionalInfoTitle());
 
-            psychologistDTO.setTherapist(therapistDTO);
-            psychologistDTO.setAdditionalInfo(additionalInfoDTO);
-            psychologistDTO.setLicense(licenseDTO);
+                    LicenseDTO licenseDTO = new LicenseDTO();
+                    licenseDTO.setDocUrl(psychologist.getLicenseDocUrl());
+                    licenseDTO.setTitle(psychologist.getLicenseTitle());
 
-            return Mono.just(psychologistDTO);
+                    psychologistDTO.setTherapist(therapistDTO);
+                    psychologistDTO.setAdditionalInfo(additionalInfoDTO);
+                    psychologistDTO.setLicense(licenseDTO);
 
-        }));
-
+                    return psychologistDTO;
+                })
+                .collectList()
+                .map(list -> {
+                    ContentDTO contentDTO = new ContentDTO();
+                    contentDTO.setContent(list); // may need casting if type mismatch
+                    contentDTO.setCount(list.size());
+                    contentDTO.setPrevKey(null); // or use pagination logic
+                    contentDTO.setNextKey(null);
+                    return contentDTO;
+                });
     }
+
 }
+
