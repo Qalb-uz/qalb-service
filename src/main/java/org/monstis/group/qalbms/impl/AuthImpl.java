@@ -28,6 +28,7 @@ import reactor.core.publisher.Mono;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -99,7 +100,9 @@ public class AuthImpl implements AuthService {
 
                     VerifyDTO.UserDto userDTO = new VerifyDTO.UserDto();
                     userDTO.setMsisdn(phone);
-                    userDTO.setName("");
+                    userDTO.setName(deviceName);
+                    userDTO.setId(Long.valueOf(UUID.randomUUID().toString()));  // Generate a new ID for the user
+
                     verifyDTO.setUser(userDTO);
                     verifyDTO.setResumeStatus(String.valueOf(VerifyDTO.ResumeStatus.INVALID));
 

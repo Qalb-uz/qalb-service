@@ -25,7 +25,7 @@ public class PsychologistSearchService {
         this.reactiveElasticsearchTemplate = reactiveElasticsearchTemplate;
     }
 
-    public Flux<SearchResultDTO> searchPsychologists(String gender, String priceForSession, String psychoIssues, Integer size, String key) {
+    public Flux<ContentDTO> searchPsychologists(String gender, String priceForSession, String psychoIssues, Integer size, String key) {
 
         Criteria criteria = new Criteria();
 
@@ -50,7 +50,7 @@ public class PsychologistSearchService {
                     Psychologist psychologist = psychologistSearchHit.getContent();
 
                     // Create DTO for Psychologist
-                    SearchResultDTO psychologistDTO = new SearchResultDTO();
+                    ContentDTO psychologistDTO = new ContentDTO();
                     TherapistDTO therapistDTO = new TherapistDTO();
                     therapistDTO.setFirstName(psychologist.getFirstName());
                     therapistDTO.setLastName(psychologist.getLastName());
@@ -71,9 +71,9 @@ public class PsychologistSearchService {
                     licenseDTO.setTitle(psychologist.getLicenseTitle());
 
                     // Set all DTO fields
-                    psychologistDTO.setTherapist(therapistDTO);
-                    psychologistDTO.setAdditionalInfo(additionalInfoDTO);
-                    psychologistDTO.setLicense(licenseDTO);
+                    psychologistDTO.setContent(psychologistDTO.getContent());
+//                    psychologistDTO.setAdditionalInfo(additionalInfoDTO);
+//                    psychologistDTO.setLicense(licenseDTO);
 
 
                     return reactiveElasticsearchTemplate.count(query, Psychologist.class).flatMap(aLong -> {
