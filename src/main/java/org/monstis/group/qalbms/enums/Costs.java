@@ -29,4 +29,14 @@ public enum Costs {
         return costsInSom;
     }
 
+    public static Costs getByName(String name) {
+        for (Costs cost : Costs.values()) {
+            if (cost.name().equalsIgnoreCase(name)) {
+                return cost;
+            }
+        }
+        throw new IllegalArgumentException("No cost enum found with name: " + name);
+    }
+
+
 }

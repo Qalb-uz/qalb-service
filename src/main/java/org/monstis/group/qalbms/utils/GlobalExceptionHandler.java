@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestControllerAdvice
@@ -26,11 +28,20 @@ public class GlobalExceptionHandler {
         return new CommonResponse(new Cause(UNKNOWN_EXCEPTION_TYPE, ex.getMessage()), false);
     }
 
-    @ExceptionHandler(AuthException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public CommonResponse handle(AuthException ex) {
-        log.error(ex.getMessage(), ex);
-        return new CommonResponse(new Cause(AUTH_EXCEPTION_TYPE, ex.getMessage()), false);
+
+    @ExceptionHandler(TypedResponseException.class)
+    public Mono<CommonResponse> handleTypedException(TypedResponseException ex) {
+        return Mono.just(new CommonResponse(
+                new Cause(ex.getType(), ex.getReason()),
+                false
+        ));
     }
 
+    @ExceptionHandler(ResponseStatusException.class)
+    public Mono<CommonResponse> handleDefaultException(ResponseStatusException ex) {
+        return Mono.just(new CommonResponse(
+                new Cause("UNKNOWN", ex.getReason()),
+                false
+        ));
+    }
 }

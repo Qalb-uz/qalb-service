@@ -9,5 +9,6 @@ import reactor.core.publisher.Mono;
 public interface AuthRepository extends R2dbcRepository<Auth,Long> {
 
     Mono<Auth>findByOtpCodeAndPhoneNumber(String otpCode,String phone);
+    Mono<Auth> findByDeviceIdAndPhoneNumber(String deviceId, String phoneNumber);
 
 }

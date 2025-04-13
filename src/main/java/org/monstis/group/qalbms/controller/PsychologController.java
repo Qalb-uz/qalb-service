@@ -30,14 +30,14 @@ public class PsychologController {
 
     @PostMapping("/add/psychologs")
     @Operation(summary = "add psychologs", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<String>savePsychologs(@RequestBody PsychologistDTO psychologistDTO) {
+    public Mono<Psychologist>savePsychologs(@RequestBody PsychologistDTO psychologistDTO) {
         return psychologistService.addPsychologyist(psychologistDTO);
 
     }
 
     @GetMapping("/get/all-psychologs")
     @Operation(summary = "add psychologs", description = "REQUIRED_ROLES: <b></b>")
-    public Flux<Psychologist> getAllPsychologs() {
+    public Flux<PsychologistDTO> getAllPsychologs() {
         return psychologistService.getAllPsychologyist();
     }
 

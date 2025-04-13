@@ -11,5 +11,8 @@ import reactor.core.publisher.Mono;
 @EnableReactiveElasticsearchRepositories
 public interface ElasticSearchRepository extends ReactiveElasticsearchRepository<Psychologist, String> {
 
+    Mono<Psychologist> findByPhoneNumber(String phoneNumber);
+
+
 
 }

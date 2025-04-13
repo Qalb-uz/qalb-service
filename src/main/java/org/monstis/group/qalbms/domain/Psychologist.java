@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 @Data
-@Document(indexName = "psychologist")
+@Document(indexName = "therapist")
 public class Psychologist  {
 
     @Id
@@ -21,9 +21,19 @@ public class Psychologist  {
     private String firstName;
     private String lastName;
     private String age;
+    private String gender;
+    private String sessionCost;
 
     @Field(type = FieldType.Keyword)
-    private String videoUrl;
+    private String imageUrl;
+
+    private String additionalInfoTitle;
+    private String additionalInfoSubtitle;
+    private String about;
+    private String licenseTitle;
+    private String licenseDocUrl;
+    private String methodTherapyTitle;
+    private String methodTherapySubtitle;
 
 
     @Field(type = FieldType.Keyword)
@@ -35,10 +45,14 @@ public class Psychologist  {
     @Field(type = FieldType.Keyword)
     private String priceForSession;
 
-    @Field(type = FieldType.Keyword)
-    private String gender;
 
-    private List<PsychologicalIssue> psychoIssues;
-    private List<PsychologicalApproach>psychologicalApproaches;
+
+
+    @Field(type = FieldType.Nested)
+    private List<String> psychoIssues;
+
+
+    @Field(type = FieldType.Keyword)
+    private List<String>psychologicalApproaches;
 
 }

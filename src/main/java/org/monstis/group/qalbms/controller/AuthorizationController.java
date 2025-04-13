@@ -8,8 +8,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.dto.OtpResponse;
 import org.monstis.group.qalbms.dto.TokenResponse;
+import org.monstis.group.qalbms.dto.VerifyDTO;
 import org.monstis.group.qalbms.service.AuthService;
+import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,29 +24,42 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Qalb project REST APIs", description = "REST APIs")
 public class AuthorizationController {
     private final AuthService authService;
+    private final JwtUtil jwtt;
 
     @Value("${termsFile}")
     private String termsAndConditions;
 
-    public AuthorizationController(AuthService authService) {
+    public AuthorizationController(AuthService authService, JwtUtil jwtt) {
         this.authService = authService;
+        this.jwtt = jwtt;
     }
 
 
     @PostMapping("/verify-otp")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    private Mono<TokenResponse>verifyOtp(@RequestParam("otp") String otp, @RequestParam("phone") String phone) {
-        return authService.verifyOtp(otp,phone).flatMap(Mono::just);
+    private Mono<VerifyDTO>verifyOtp(@RequestParam("otp") String otp, @RequestParam("phone") String phone,
+                                      @RequestHeader("X-Device-Name") String deviceName,
+                                     @RequestHeader("X-Device-Id") String deviceId) {
+        return authService.verifyOtp(otp,phone,deviceName,deviceId).flatMap(Mono::just);
     }
 
     @Operation(summary = "Register phone and send OTP",
             responses = @ApiResponse(responseCode = "200", description = "OTP sent",
                     content = @Content(schema = @Schema(implementation = OtpResponse.class))))
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<OtpResponse>> registerPhone(@RequestParam String phone) {
-        return authService.registerPhone(phone);
+    public Mono<ResponseEntity<OtpResponse>> registerPhone(@RequestParam String phone,@RequestHeader("X-Device-Name") String deviceName,
+                                                            @RequestHeader("X-Device-Id") String deviceId) {
+        return authService.registerPhone(phone,deviceName,deviceId);
     }
-
+    @PostMapping("/refresh-token")
+    public ResponseEntity<TokenResponse> refreshToken(@RequestParam("refreshToken")  String refreshToken) {
+        try {
+            TokenResponse newTokens = jwtt.refreshToken(refreshToken);
+            return ResponseEntity.ok(newTokens);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 
     @GetMapping("/terms-condition")
     @Operation(summary = "terms and condition file", description = "REQUIRED_ROLES: <b></b>")

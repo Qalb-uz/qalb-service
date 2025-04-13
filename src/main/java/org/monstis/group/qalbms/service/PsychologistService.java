@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Service
 public interface PsychologistService {
 
-    Mono<String>addPsychologyist(PsychologistDTO psychologistDTO);
+    Mono<Psychologist>addPsychologyist(PsychologistDTO psychologistDTO);
 
-    Flux<Psychologist>getAllPsychologyist();
+    Flux<PsychologistDTO>getAllPsychologyist();
 }

@@ -9,6 +9,7 @@ import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
 import org.monstis.group.qalbms.dto.TopicDTO;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.utils.JwtUtil;
+import org.monstis.group.qalbms.utils.TypedResponseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -48,16 +49,16 @@ public class ApplicationController {
              return applicationRepository.findFirstByUsername(jwtUtil.extractUsername(token)).flatMap(psychoIssueAnswer -> {
                 if(psychoIssueAnswer.isValid())
                 {
-                    return Mono.just("Client application valid");
+                    return Mono.just(psychoIssueAnswer);
                 }
            return Mono.just((psychoIssueAnswer));
-       }).switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT, "Client application not found")));
+       }).switchIfEmpty(Mono.error(new TypedResponseException(HttpStatus.NO_CONTENT,"RESUME", "Client resume not found")));
 
     }
 
-    @PutMapping("edit-client-application")
-    public Mono<?>editClientApplication(@RequestBody TopicDTO topicsFlux) {
-        return applicationRepository.save(topicsFlux);
-    }
+//    @PutMapping("edit-client-application")
+//    public Mono<?>editClientApplication(@RequestBody TopicDTO topicsFlux) {
+//        return applicationRepository.save(topicsFlux);
+//    }
 
 } 

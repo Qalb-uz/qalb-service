@@ -3,36 +3,35 @@ package org.monstis.group.qalbms.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+import org.monstis.group.qalbms.dto.VerifyDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
-@Accessors(chain = true)
+@Table("client")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value ="auth" )
-public class Auth implements Serializable
-{
+public class Client {
+
     @Id
     private Long id;
 
-    @Column("otp_code")
-    private String otpCode;
-
-    @Column("phone_number")
-    private String phoneNumber;
-
+    @Column("device_name")
+    private String deviceName;
     @Column("device_id")
     private String deviceId;
-    @Column("created_at")
-    private Instant createdAt;
-
-    @Column("otp_verified")
-    private Boolean verified;
-
+    @Column("first_name")
+    private String firstName;
+    @Column("msisdn")
+    private String msisdn;
+    @Column("first_login_at")
+    private Instant firstLoginAt;
+    @Column("resume_id")
+    private String resumeId;
+    @Column("resume_status")
+    private String resumeStatus;
 }

@@ -27,8 +27,7 @@ public class OpenApiConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                         ))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-key")).servers(List.of(
-                        new Server().url("localhost:8080").description("Local HTTPS")
-                ));
+                .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
+
     }
 }
