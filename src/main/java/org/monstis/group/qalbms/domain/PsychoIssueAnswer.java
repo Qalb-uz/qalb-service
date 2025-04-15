@@ -39,9 +39,12 @@ public class PsychoIssueAnswer {
 
 
 
-
-    public boolean isValid() {
-        return  title != null && !title.trim().isEmpty() && subtopics != null &&
-                 !sessionFor.isEmpty()&& !firstName.isEmpty()&& !theraphyLanguage.isEmpty();
-    }
+public boolean isValid() {
+    return title != null && !title.trim().isEmpty()
+        && subtopics != null && !subtopics.trim().isEmpty()
+        && cost != null && !cost.trim().isEmpty()
+        && sessionFor != null && !sessionFor.trim().isEmpty()
+        && firstName != null && !firstName.trim().isEmpty()
+        && theraphyLanguage != null && !theraphyLanguage.trim().isEmpty();
+}
 }
