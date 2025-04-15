@@ -28,6 +28,7 @@ public class KeycloakSecurityWebConfig {
 								"/v3/api-docs/**",
 								"/swagger-ui.html",
 								"/api/register",
+								"/api/refresh-token/**",
 								"/api/verify-otp",
 								"/swagger-ui/**"
 						).permitAll()
