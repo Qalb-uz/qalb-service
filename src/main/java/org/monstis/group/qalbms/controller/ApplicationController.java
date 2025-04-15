@@ -52,7 +52,7 @@ public class ApplicationController {
                     return Mono.just(psychoIssueAnswer);
                 }
            return Mono.just((psychoIssueAnswer));
-       }).switchIfEmpty(Mono.error(new TypedResponseException(HttpStatus.NO_CONTENT,"RESUME", "Client resume not found")));
+       }).switchIfEmpty(Mono.error(new TypedResponseException(HttpStatus.NOT_FOUND,"RESUME", "Client resume not found")));
 
     }
 
