@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class TheraphyImpl implements TheraphyService {
 
+      
+
     @Override
     public Mono<Map<String,String>> getKeyWords() {
         Map<String, String> functionalities = Arrays.stream(PsychologicalIssue.values())
@@ -97,12 +99,14 @@ public class TheraphyImpl implements TheraphyService {
 
         List<TopicDTO> topics = new ArrayList<>();
         int topicId = 0;
+         int subId = 0;
+      
 
         for (Map.Entry<String, List<PsychologicalApproach>> entry : topicToSubtopics.entrySet()) {
             String topicTitle = entry.getKey();
             List<SubtopicDTO> subtopics = new ArrayList<>();
 
-            int subId = 0;
+           
             for (PsychologicalApproach approach : entry.getValue()) {
                 subtopics.add(new SubtopicDTO(subId++, approach.getDescription("ru")));
             }
