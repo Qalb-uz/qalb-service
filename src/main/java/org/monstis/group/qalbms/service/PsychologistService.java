@@ -2,6 +2,7 @@ package org.monstis.group.qalbms.service;
 
 
 import org.monstis.group.qalbms.domain.Psychologist;
+import org.monstis.group.qalbms.dto.CalendarContentDTO;
 import org.monstis.group.qalbms.dto.ContentDTO;
 import org.monstis.group.qalbms.dto.ContentForAllDTO;
 import org.monstis.group.qalbms.dto.PsychologistDTO;
@@ -15,4 +16,6 @@ public interface PsychologistService {
     Mono<Psychologist>addPsychologyist(PsychologistDTO psychologistDTO);
 
     Mono<ContentDTO>getAllPsychologyist();
+
+    Mono<CalendarContentDTO>getAllPsychologyistOnlyDate();
 }

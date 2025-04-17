@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public class UzbekistanPhoneNumberValidator {
 
     public boolean isValidUzbekistanPhoneNumber(String phoneNumber) {
-        String uzbekistanPhoneNumberRegex = "^(?:\\+998|998)(9[0-9]|6[0-9]|7[0-9]|8[0-9])[0-9]{7}$";
+        String uzbekistanPhoneNumberRegex = "998(20|9[0-9])\\d{7}";
 
         if (phoneNumber.matches(uzbekistanPhoneNumberRegex)) {
             System.out.println("The phone number is valid.");

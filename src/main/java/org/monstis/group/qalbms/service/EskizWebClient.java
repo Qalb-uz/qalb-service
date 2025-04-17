@@ -40,9 +40,10 @@ public class EskizWebClient {
 
     public Mono<EskizResponseDTO> register(String phone, String token, int otp) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        String appHash ="0Z7HCamduWZ";
 
         formData.add("mobile_phone", phone);
-        formData.add("message", "Код для верификации в сервисе Qalb.uz: " + otp);
+        formData.add("message", "Qalb.uz ilovasida ro'yxatdan o'tish uchun kod: " + otp+"\n"+appHash);
         formData.add("from", "4546");
         formData.add("callback_url","https://qalb.uz");
 

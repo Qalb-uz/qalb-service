@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
+import org.monstis.group.qalbms.dto.CalendarContentDTO;
 import org.monstis.group.qalbms.dto.ContentDTO;
 import org.monstis.group.qalbms.dto.ContentForAllDTO;
 import org.monstis.group.qalbms.dto.PagenationData;
@@ -63,6 +64,28 @@ public class SearchController {
                 );
     }
 
+    @GetMapping("/get-session-dates")
+    @Operation(summary = "search for psychologists", description = "REQUIRED_ROLES: <b></b>")
+    public Mono<CalendarContentDTO> getCalendarDates(
+            ServerWebExchange exchange,
+            @RequestBody PagenationData pageData
+    ) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+
+        return psychologistService.getAllPsychologyistOnlyDate();
+//        return applicationRepository.findFirstByUsername(username)
+//                .flatMap(psychoIssueAnswer ->
+//                        psychologistSearchService.getCalendarDates(
+//                                psychoIssueAnswer.getCost(),
+//                                psychoIssueAnswer.getTime(),
+//                                psychoIssueAnswer.getSubtopics(),
+//                                pageData.getSize(),
+//                                pageData.getKey()
+//                        )
+//                );
+    }
 
 
 

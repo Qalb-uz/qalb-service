@@ -11,6 +11,8 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+
 @Service
 public class PsychologistSearchService {
 
@@ -75,6 +77,43 @@ public class PsychologistSearchService {
                         }));
     }
 
+//    public Mono<CalendarContentDTO> getCalendarDates(String gender, String priceForSession, String psychoIssues, Integer size, String key) {
+//        Criteria criteria = new Criteria();
+//
+//        if (gender != null) {
+//            criteria = criteria.and("gender").contains(gender);
+//        }
+//        if (gender != null) {
+//            criteria = criteria.and("gender").contains(gender);
+//        }
+//
+//        if (priceForSession != null && !priceForSession.trim().isEmpty()) {
+//            criteria = criteria.and("priceForSession").contains(priceForSession.trim());
+//        }
+//
+//        int page = key != null ? Integer.parseInt(key) : 0;
+//
+//        Query query = new CriteriaQuery(criteria);
+//        query.setPageable(PageRequest.of(page, size));
+//
+//        return reactiveElasticsearchTemplate.search(query, Psychologist.class)
+//                .map(hit -> {
+//                    Psychologist psychologist = hit.getContent();
+//                    CalendarContentDTO result = new CalendarContentDTO();
+//                    result.setDay(psychologist.getDays());
+//                    result.setHours((psychologist.getHours()));
+//
+//                    return result;
+//                })
+//                .collectList()
+//                .flatMap(results -> reactiveElasticsearchTemplate.count(query, Psychologist.class)
+//                        .map(count -> {
+//                            String prevKey = (page > 0) ? String.valueOf(page - 1) : null;
+//                            String nextKey = results.size() == size ? String.valueOf(page + 1) : null;
+//
+//                            return new CalendarContentDTO(results.get(0).getDay(),results.get(0).getHours());
+//                        }));
+//    }
 
 
 

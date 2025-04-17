@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.monstis.group.qalbms.enums.Gender;
 
+import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -17,4 +19,6 @@ public  class TherapistDTO{
     private Gender gender;
     private String priceForSession;
     private String phoneNumber;
+    private String days;
+    private List<String> hours;
 }

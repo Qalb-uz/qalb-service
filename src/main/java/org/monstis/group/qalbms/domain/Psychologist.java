@@ -37,7 +37,10 @@ public class Psychologist  {
 
 
     @Field(type = FieldType.Keyword)
-    private Map<String,String> psychoCalendar;
+    private List<String> hours;
+
+    @Field(type = FieldType.Keyword)
+    private String days;
 
     @Field(type = FieldType.Keyword)
     private String phoneNumber;

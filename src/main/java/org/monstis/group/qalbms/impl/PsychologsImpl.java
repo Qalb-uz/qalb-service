@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -36,6 +37,8 @@ public class PsychologsImpl implements PsychologistService {
             psychologist.setPriceForSession(psychologistDTO.getTherapist().getPriceForSession());
             psychologist.setFirstName(psychologistDTO.getTherapist().getFirstName());
             psychologist.setLastName(psychologistDTO.getTherapist().getLastName());
+            psychologist.setDays(psychologistDTO.getTherapist().getDays());
+            psychologist.setHours(psychologistDTO.getTherapist().getHours());
             psychologist.setPhoneNumber(psychologistDTO.getTherapist().getPhoneNumber());
             psychologist.setGender(psychologistDTO.getTherapist().getGender().name());
             psychologist.setPsychoIssues(List.of(PsychologicalIssue.ANXIETY.name(), PsychologicalIssue.DEPRESSION.name()));
@@ -53,6 +56,8 @@ public class PsychologsImpl implements PsychologistService {
                     psychologist1.setLastName(psychologistDTO.getTherapist().getLastName());
                     psychologist1.setPhoneNumber(psychologistDTO.getTherapist().getPhoneNumber());
                     psychologist1.setGender(psychologistDTO.getTherapist().getGender().name());
+                    psychologist1.setDays(psychologistDTO.getTherapist().getDays());
+                    psychologist1.setHours(psychologistDTO.getTherapist().getHours());
                     psychologist1.setPsychoIssues(List.of(PsychologicalIssue.ANXIETY.name(), PsychologicalIssue.DEPRESSION.name()));
                     psychologist1.setLicenseDocUrl(psychologistDTO.getLicense().getDocUrl());
                     psychologist1.setLicenseTitle(psychologistDTO.getLicense().getTitle());
@@ -105,6 +110,39 @@ public class PsychologsImpl implements PsychologistService {
                     contentDTO.setCount(list.size());
                     contentDTO.setPrevKey(null); // or use pagination logic
                     contentDTO.setNextKey(null);
+                    return contentDTO;
+                });
+    }
+    @Override
+    public Mono<CalendarContentDTO> getAllPsychologyistOnlyDate() {
+        return elasticSearchRepository.findAll()
+                .map(psychologist -> {
+                    SessionCalendar psychologistDTO = new SessionCalendar();
+
+                    TherapistDTO therapistDTO = new TherapistDTO();
+
+                    therapistDTO.setDays(psychologist.getDays());
+                    therapistDTO.setHours(psychologist.getHours());
+                    AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
+                    additionalInfoDTO.setSubtitle(psychologist.getAdditionalInfoSubtitle());
+                    additionalInfoDTO.setTitle(psychologist.getAdditionalInfoTitle());
+
+
+
+                    psychologistDTO.setDay(psychologist.getDays());
+                    psychologistDTO.setHours(psychologist.getHours());
+
+
+
+                    return psychologistDTO;
+                })
+                .collectList()
+                .map(list -> {
+                    CalendarContentDTO contentDTO = new CalendarContentDTO();
+                    contentDTO.setContent(list); // may need casting if type mismatch
+                    contentDTO.setPrevKey(null); // or use pagination logic
+                    contentDTO.setNextKey(null);
+                    contentDTO.setCount(String.valueOf(list.size()));
                     return contentDTO;
                 });
     }
