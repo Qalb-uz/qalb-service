@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public  class TherapistDTO{
 
+    private String id;
     private String firstName;
     private String lastName;
     private String image;

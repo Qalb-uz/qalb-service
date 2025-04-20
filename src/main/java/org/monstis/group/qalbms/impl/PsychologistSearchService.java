@@ -45,6 +45,7 @@ public class PsychologistSearchService {
                     Psychologist psychologist = hit.getContent();
 
                     TherapistDTO therapistDTO = new TherapistDTO();
+                    therapistDTO.setId(psychologist.getId());
                     therapistDTO.setFirstName(psychologist.getFirstName());
                     therapistDTO.setLastName(psychologist.getLastName());
                     therapistDTO.setGender(Gender.valueOf(psychologist.getGender()));
