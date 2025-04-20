@@ -20,6 +20,6 @@ public class PsychologistDTO extends SearchResultDTO{
     private String id;
 
     private TherapistDTO therapist;
-    private AdditionalInfoDTO additionalInfo;
-    private LicenseDTO license;
+    private List<AdditionalInfoDTO> additionalInfo;
+    private List<LicenseDTO> license;
 }

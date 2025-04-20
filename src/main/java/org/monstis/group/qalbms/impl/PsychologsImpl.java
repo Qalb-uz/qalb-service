@@ -42,10 +42,22 @@ public class PsychologsImpl implements PsychologistService {
             psychologist.setPhoneNumber(psychologistDTO.getTherapist().getPhoneNumber());
             psychologist.setGender(psychologistDTO.getTherapist().getGender().name());
             psychologist.setPsychoIssues(List.of(PsychologicalIssue.ANXIETY.name(), PsychologicalIssue.DEPRESSION.name()));
-            psychologist.setLicenseDocUrl(psychologistDTO.getLicense().getDocUrl());
-            psychologist.setLicenseTitle(psychologistDTO.getLicense().getTitle());
-            psychologist.setAdditionalInfoSubtitle(psychologistDTO.getAdditionalInfo().getSubtitle());
-            psychologist.setAdditionalInfoTitle(psychologistDTO.getAdditionalInfo().getTitle());
+
+            List<AdditionalInfoDTO>addInfoList=psychologistDTO.getAdditionalInfo();
+            addInfoList.forEach(additionalInfoDTO -> {
+                psychologist.setAdditionalInfoSubtitle(additionalInfoDTO.getSubtitle());
+                psychologist.setAdditionalInfoTitle(additionalInfoDTO.getTitle());
+            });
+            List<LicenseDTO>licenseDTOList=psychologistDTO.getLicense();
+            licenseDTOList.forEach(licenseDTORes -> {
+                psychologist.setLicenseDocUrl(licenseDTORes.getDocUrl());
+                psychologist.setLicenseTitle(licenseDTORes.getTitle());
+
+            });
+
+
+
+
             return elasticSearchRepository.save(psychologist);
         })).flatMap(psychologist1 -> {
 
@@ -59,11 +71,18 @@ public class PsychologsImpl implements PsychologistService {
                     psychologist1.setDays(psychologistDTO.getTherapist().getDays());
                     psychologist1.setHours(psychologistDTO.getTherapist().getHours());
                     psychologist1.setPsychoIssues(List.of(PsychologicalIssue.ANXIETY.name(), PsychologicalIssue.DEPRESSION.name()));
-                    psychologist1.setLicenseDocUrl(psychologistDTO.getLicense().getDocUrl());
-                    psychologist1.setLicenseTitle(psychologistDTO.getLicense().getTitle());
-                    psychologist1.setAdditionalInfoSubtitle(psychologistDTO.getAdditionalInfo().getSubtitle());
-                    psychologist1.setAdditionalInfoTitle(psychologistDTO.getAdditionalInfo().getTitle());
 
+                    List<AdditionalInfoDTO>addInfoList=psychologistDTO.getAdditionalInfo();
+                    addInfoList.forEach(additionalInfoDTO -> {
+                        psychologist1.setAdditionalInfoSubtitle(additionalInfoDTO.getSubtitle());
+                        psychologist1.setAdditionalInfoTitle(additionalInfoDTO.getTitle());
+                    });
+                    List<LicenseDTO>licenseDTOList=psychologistDTO.getLicense();
+                    licenseDTOList.forEach(licenseDTORes -> {
+                        psychologist1.setLicenseDocUrl(licenseDTORes.getDocUrl());
+                        psychologist1.setLicenseTitle(licenseDTORes.getTitle());
+
+                    });
             return elasticSearchRepository.save(psychologist1)
                     .onErrorResume(e -> {
                         log.error("Error saving psychologist: {}", e.getMessage());
@@ -98,8 +117,8 @@ public class PsychologsImpl implements PsychologistService {
                     licenseDTO.setTitle(psychologist.getLicenseTitle());
 
                     psychologistDTO.setTherapist(therapistDTO);
-                    psychologistDTO.setAdditionalInfo(additionalInfoDTO);
-                    psychologistDTO.setLicense(licenseDTO);
+                    psychologistDTO.setAdditionalInfo(Collections.singletonList(additionalInfoDTO));
+                    psychologistDTO.setLicense(Collections.singletonList(licenseDTO));
 
                     return psychologistDTO;
                 })

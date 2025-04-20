@@ -62,8 +62,8 @@ public class PsychologistSearchService {
 
                     SearchResultDTO result = new SearchResultDTO();
                     result.setTherapist(therapistDTO);
-                    result.setAdditionalInfo(additionalInfoDTO);
-                    result.setLicense(licenseDTO);
+                    result.setAdditionalInfo(Collections.singletonList(additionalInfoDTO));
+                    result.setLicense(Collections.singletonList(licenseDTO));
 
                     return result;
                 })
