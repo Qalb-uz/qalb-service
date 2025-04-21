@@ -1,5 +1,6 @@
 package org.monstis.group.qalbms.impl;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.domain.Psychologist;
 import org.monstis.group.qalbms.dto.*;
@@ -7,11 +8,15 @@ import org.monstis.group.qalbms.enums.Gender;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.monstis.group.qalbms.repository.ElasticSearchRepository;
 import org.monstis.group.qalbms.service.PsychologistService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +28,17 @@ public class PsychologsImpl implements PsychologistService {
     public PsychologsImpl(ElasticSearchRepository elasticSearchRepository) {
         this.elasticSearchRepository = elasticSearchRepository;
     }
+    @Autowired
+    private ConversionService conversionService;
+
+//    @PostConstruct
+//    public void init() {
+//        if (conversionService.canConvert(String.class, OffsetDateTime.class)) {
+//            System.out.println("Custom converter is registered!");
+//        } else {
+//            System.out.println("Custom converter is NOT registered.");
+//        }
+//    }
 
     @Override
     public Mono<Psychologist> addPsychologyist(PsychologistDTO psychologistDTO) {
@@ -32,12 +48,19 @@ public class PsychologsImpl implements PsychologistService {
         return elasticSearchRepository.findByPhoneNumber(psychologistDTO.getTherapist().getPhoneNumber())
                 .switchIfEmpty(Mono.defer(() -> {
             Psychologist psychologist = new Psychologist();
+
+            MethodTherapyDTO methodTherapyDTO = new MethodTherapyDTO();
+            methodTherapyDTO.setSubtitle(psychologist.getMethodTherapySubtitle());
+            methodTherapyDTO.setTitle(psychologist.getMethodTherapyTitle());
+
+            psychologist.setMethodTherapySubtitle(methodTherapyDTO.getSubtitle());
+            psychologist.setMethodTherapyTitle(methodTherapyDTO.getTitle());
             psychologist.setFirstName(psychologistDTO.getTherapist().getFirstName());
             psychologist.setGender(psychologistDTO.getTherapist().getGender().name());
             psychologist.setPriceForSession(psychologistDTO.getTherapist().getPriceForSession());
             psychologist.setFirstName(psychologistDTO.getTherapist().getFirstName());
             psychologist.setLastName(psychologistDTO.getTherapist().getLastName());
-            psychologist.setDays(psychologistDTO.getTherapist().getDays());
+            psychologist.setDays((psychologistDTO.getTherapist().getDays()));
             psychologist.setHours(psychologistDTO.getTherapist().getHours());
             psychologist.setPhoneNumber(psychologistDTO.getTherapist().getPhoneNumber());
             psychologist.setGender(psychologistDTO.getTherapist().getGender().name());
@@ -68,9 +91,16 @@ public class PsychologsImpl implements PsychologistService {
                     psychologist1.setLastName(psychologistDTO.getTherapist().getLastName());
                     psychologist1.setPhoneNumber(psychologistDTO.getTherapist().getPhoneNumber());
                     psychologist1.setGender(psychologistDTO.getTherapist().getGender().name());
-                    psychologist1.setDays(psychologistDTO.getTherapist().getDays());
+                    psychologist1.setDays((psychologistDTO.getTherapist().getDays()));
                     psychologist1.setHours(psychologistDTO.getTherapist().getHours());
                     psychologist1.setPsychoIssues(List.of(PsychologicalIssue.ANXIETY.name(), PsychologicalIssue.DEPRESSION.name()));
+
+                    MethodTherapyDTO methodTherapyDTO = new MethodTherapyDTO();
+                    methodTherapyDTO.setSubtitle(psychologist1.getMethodTherapySubtitle());
+                    methodTherapyDTO.setTitle(psychologist1.getMethodTherapyTitle());
+
+                    psychologist1.setMethodTherapySubtitle(methodTherapyDTO.getSubtitle());
+                    psychologist1.setMethodTherapyTitle(methodTherapyDTO.getTitle());
 
                     List<AdditionalInfoDTO>addInfoList=psychologistDTO.getAdditionalInfo();
                     addInfoList.forEach(additionalInfoDTO -> {
@@ -107,6 +137,8 @@ public class PsychologsImpl implements PsychologistService {
                     therapistDTO.setGender(Gender.valueOf(psychologist.getGender()));
                     therapistDTO.setPriceForSession(psychologist.getPriceForSession());
                     therapistDTO.setPhoneNumber(psychologist.getPhoneNumber());
+                    therapistDTO.setHours(psychologist.getHours());
+                    therapistDTO.setDays(psychologist.getDays());
 
                     AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
                     additionalInfoDTO.setSubtitle(psychologist.getAdditionalInfoSubtitle());
@@ -116,9 +148,15 @@ public class PsychologsImpl implements PsychologistService {
                     licenseDTO.setDocUrl(psychologist.getLicenseDocUrl());
                     licenseDTO.setTitle(psychologist.getLicenseTitle());
 
+                    MethodTherapyDTO methodTherapyDTO = new MethodTherapyDTO();
+                    methodTherapyDTO.setSubtitle(psychologist.getMethodTherapySubtitle());
+                    methodTherapyDTO.setTitle(psychologist.getMethodTherapyTitle());
+
                     psychologistDTO.setTherapist(therapistDTO);
                     psychologistDTO.setAdditionalInfo(Collections.singletonList(additionalInfoDTO));
+                    psychologistDTO.setMethodTherapy(Collections.singletonList(methodTherapyDTO));
                     psychologistDTO.setLicense(Collections.singletonList(licenseDTO));
+
 
                     return psychologistDTO;
                 })
@@ -148,8 +186,8 @@ public class PsychologsImpl implements PsychologistService {
 
 
 
-                    psychologistDTO.setDay(psychologist.getDays());
-                    psychologistDTO.setHours(psychologist.getHours());
+                    psychologistDTO.setDay((psychologist.getDays()));
+                    psychologistDTO.setHours(((psychologist.getHours())));
 
 
 

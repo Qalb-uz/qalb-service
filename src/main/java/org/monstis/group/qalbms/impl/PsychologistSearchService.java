@@ -52,6 +52,8 @@ public class PsychologistSearchService {
                     therapistDTO.setPriceForSession(psychologist.getPriceForSession());
                     therapistDTO.setPhoneNumber(psychologist.getPhoneNumber());
                     therapistDTO.setImage(psychologist.getImageUrl());
+                    therapistDTO.setDays(psychologist.getDays());
+                    therapistDTO.setHours(psychologist.getHours());
 
                     AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
                     additionalInfoDTO.setTitle(psychologist.getAdditionalInfoTitle());
@@ -63,6 +65,15 @@ public class PsychologistSearchService {
 
                     SearchResultDTO result = new SearchResultDTO();
                     result.setTherapist(therapistDTO);
+
+                    MethodTherapyDTO methodTherapyDTO = new MethodTherapyDTO();
+                    methodTherapyDTO.setSubtitle(String.valueOf(psychologist.getPsychoIssues()));
+                    methodTherapyDTO.setTitle(String.valueOf(psychologist.getPsychologicalApproaches()));
+
+                    result.setMethodTherapy(Collections.singletonList(methodTherapyDTO));
+
+
+                    result.setAbout(psychologist.getAbout());
                     result.setAdditionalInfo(Collections.singletonList(additionalInfoDTO));
                     result.setLicense(Collections.singletonList(licenseDTO));
 

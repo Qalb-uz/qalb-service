@@ -14,4 +14,6 @@ public class SearchResultDTO {
     private TherapistDTO therapist;
     private List<AdditionalInfoDTO> additionalInfo;
     private List<LicenseDTO> license;
+    private List<MethodTherapyDTO> methodTherapy;
+    private String about;
 }

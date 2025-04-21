@@ -1,5 +1,6 @@
 package org.monstis.group.qalbms.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.monstis.group.qalbms.enums.PsychologicalApproach;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
@@ -8,6 +9,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -37,10 +41,12 @@ public class Psychologist  {
 
 
     @Field(type = FieldType.Keyword)
-    private List<String> hours;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private List<LocalDateTime> hours;
 
     @Field(type = FieldType.Keyword)
-    private String days;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime days;
 
     @Field(type = FieldType.Keyword)
     private String phoneNumber;

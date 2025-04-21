@@ -1,10 +1,13 @@
 package org.monstis.group.qalbms.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.monstis.group.qalbms.enums.Gender;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 
@@ -20,6 +23,8 @@ public  class TherapistDTO{
     private Gender gender;
     private String priceForSession;
     private String phoneNumber;
-    private String days;
-    private List<String> hours;
+
+    private LocalDateTime days;
+
+    private List<LocalDateTime> hours;
 }

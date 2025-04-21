@@ -17,9 +17,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class PsychologistDTO extends SearchResultDTO{
 
-    private String id;
-
     private TherapistDTO therapist;
     private List<AdditionalInfoDTO> additionalInfo;
     private List<LicenseDTO> license;
+    private List<MethodTherapyDTO> methodTherapy;
 }

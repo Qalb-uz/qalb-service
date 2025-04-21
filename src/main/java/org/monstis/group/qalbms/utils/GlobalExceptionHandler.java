@@ -37,11 +37,11 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public Mono<CommonResponse> handleDefaultException(ResponseStatusException ex) {
-        return Mono.just(new CommonResponse(
-                new Cause("UNKNOWN", ex.getReason()),
-                false
-        ));
-    }
+//    @ExceptionHandler(ResponseStatusException.class)
+//    public Mono<CommonResponse> handleDefaultException(ResponseStatusException ex) {
+//        return Mono.just(new CommonResponse(
+//                new Cause("UNKNOWN", ex.getReason()),
+//                false
+//        ));
+//    }
 }
