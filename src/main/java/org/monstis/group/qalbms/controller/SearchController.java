@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.dto.CalendarContentDTO;
 import org.monstis.group.qalbms.dto.ContentDTO;
-import org.monstis.group.qalbms.dto.ContentForAllDTO;
-import org.monstis.group.qalbms.dto.PagenationData;
 import org.monstis.group.qalbms.impl.PsychologistSearchService;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.service.PsychologistService;
@@ -42,14 +40,14 @@ public class SearchController {
     public Mono<ContentDTO> searchPsychologists(
             @RequestParam("apply_filter") Boolean filter,
             ServerWebExchange exchange,
-            @RequestBody PagenationData pageData
+            @RequestParam("size") Integer size,@RequestParam("key") Integer key
     ) {
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);
 
         if (!filter) {
-            return psychologistService.getAllPsychologyist();
+            return psychologistService.getAllPsychologyist(size, key);
         }
 
         return applicationRepository.findFirstByUsername(username)
@@ -58,8 +56,8 @@ public class SearchController {
                                 psychoIssueAnswer.getPsychoGender(),
                                 psychoIssueAnswer.getCost(),
                                 psychoIssueAnswer.getSubtopics(),
-                                pageData.getSize(),
-                                pageData.getKey()
+                                size,
+                                String.valueOf(key)
                         )
                 );
     }
@@ -68,23 +66,14 @@ public class SearchController {
     @Operation(summary = "search for psychologists", description = "REQUIRED_ROLES: <b></b>")
     public Mono<CalendarContentDTO> getCalendarDates(
             ServerWebExchange exchange,
-            @RequestBody PagenationData pageData
+            @RequestParam("psychologist_id") String psychologistId
     ) {
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);
 
-        return psychologistService.getAllPsychologyistOnlyDate();
-//        return applicationRepository.findFirstByUsername(username)
-//                .flatMap(psychoIssueAnswer ->
-//                        psychologistSearchService.getCalendarDates(
-//                                psychoIssueAnswer.getCost(),
-//                                psychoIssueAnswer.getTime(),
-//                                psychoIssueAnswer.getSubtopics(),
-//                                pageData.getSize(),
-//                                pageData.getKey()
-//                        )
-//                );
+        return psychologistService.findByPsychologId(psychologistId);
+
     }
 
 

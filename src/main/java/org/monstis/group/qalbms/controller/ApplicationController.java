@@ -39,8 +39,10 @@ public class ApplicationController {
         return applicationRepository.saveAll(topicsList)
                 .next();
     }
-
-
+    @PostMapping("delete-client-application")
+    public Mono<Boolean>deleteClientApplication(@RequestParam("username") String username) {
+        return applicationRepository.deleteByUsername(username);
+    }
 
     @GetMapping("check-client-application")
     public Mono<?> checkClientApplication(ServerWebExchange exchange) {

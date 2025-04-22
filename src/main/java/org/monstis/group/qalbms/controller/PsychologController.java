@@ -36,8 +36,8 @@ public class PsychologController {
 
     @GetMapping("/get/all-psychologs")
     @Operation(summary = "add psychologs", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<ContentDTO> getAllPsychologs() {
-        return psychologistService.getAllPsychologyist();
+    public Mono<ContentDTO> getAllPsychologs( @RequestParam("size") Integer size, @RequestParam("key") Integer key) {
+        return psychologistService.getAllPsychologyist(key, size);
     }
 
 

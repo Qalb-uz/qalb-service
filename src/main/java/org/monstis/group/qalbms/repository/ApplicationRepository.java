@@ -13,4 +13,6 @@ public interface ApplicationRepository extends ReactiveCrudRepository<PsychoIssu
     Mono<PsychoIssueAnswer> findFirstByUsername(String username);
 
     Mono<PsychoIssueAnswer>save(TopicDTO topicDTO);
+
+    Mono<Boolean>deleteByUsername(String username);
 }

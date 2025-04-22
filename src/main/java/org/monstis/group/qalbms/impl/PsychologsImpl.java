@@ -8,9 +8,11 @@ import org.monstis.group.qalbms.enums.Gender;
 import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.monstis.group.qalbms.repository.ElasticSearchRepository;
 import org.monstis.group.qalbms.service.PsychologistService;
+import org.monstis.group.qalbms.utils.TypedResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,17 +30,7 @@ public class PsychologsImpl implements PsychologistService {
     public PsychologsImpl(ElasticSearchRepository elasticSearchRepository) {
         this.elasticSearchRepository = elasticSearchRepository;
     }
-    @Autowired
-    private ConversionService conversionService;
 
-//    @PostConstruct
-//    public void init() {
-//        if (conversionService.canConvert(String.class, OffsetDateTime.class)) {
-//            System.out.println("Custom converter is registered!");
-//        } else {
-//            System.out.println("Custom converter is NOT registered.");
-//        }
-//    }
 
     @Override
     public Mono<Psychologist> addPsychologyist(PsychologistDTO psychologistDTO) {
@@ -125,20 +117,26 @@ public class PsychologsImpl implements PsychologistService {
     }
 
 
-    @Override
-    public Mono<ContentDTO> getAllPsychologyist() {
+    public Mono<ContentDTO> getAllPsychologyist(Integer page, Integer size) {
+        int skip = page * size;
+
         return elasticSearchRepository.findAll()
+                .skip(skip)
+                .take(size)
                 .map(psychologist -> {
                     SearchResultDTO psychologistDTO = new SearchResultDTO();
-
                     TherapistDTO therapistDTO = new TherapistDTO();
+                    therapistDTO.setId(psychologist.getId());
                     therapistDTO.setFirstName(psychologist.getFirstName());
                     therapistDTO.setLastName(psychologist.getLastName());
                     therapistDTO.setGender(Gender.valueOf(psychologist.getGender()));
                     therapistDTO.setPriceForSession(psychologist.getPriceForSession());
                     therapistDTO.setPhoneNumber(psychologist.getPhoneNumber());
+                    psychologistDTO.setAbout(psychologist.getAbout());
+
                     therapistDTO.setHours(psychologist.getHours());
                     therapistDTO.setDays(psychologist.getDays());
+                    therapistDTO.setImage(psychologist.getImageUrl());
 
                     AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
                     additionalInfoDTO.setSubtitle(psychologist.getAdditionalInfoSubtitle());
@@ -157,22 +155,21 @@ public class PsychologsImpl implements PsychologistService {
                     psychologistDTO.setMethodTherapy(Collections.singletonList(methodTherapyDTO));
                     psychologistDTO.setLicense(Collections.singletonList(licenseDTO));
 
-
                     return psychologistDTO;
                 })
                 .collectList()
                 .map(list -> {
                     ContentDTO contentDTO = new ContentDTO();
-                    contentDTO.setContent(list); // may need casting if type mismatch
+                    contentDTO.setContent(list);
                     contentDTO.setCount(list.size());
-                    contentDTO.setPrevKey(null); // or use pagination logic
-                    contentDTO.setNextKey(null);
+                    contentDTO.setPrevKey(String.valueOf(page > 0 ? page - 1 : null));
+                    contentDTO.setNextKey(String.valueOf(list.size() == size ? page + 1 : null));
                     return contentDTO;
                 });
     }
     @Override
-    public Mono<CalendarContentDTO> getAllPsychologyistOnlyDate() {
-        return elasticSearchRepository.findAll()
+    public Mono<CalendarContentDTO> findByPsychologId( String psychologistId) {
+        return elasticSearchRepository.findById(psychologistId)
                 .map(psychologist -> {
                     SessionCalendar psychologistDTO = new SessionCalendar();
 
@@ -189,19 +186,16 @@ public class PsychologsImpl implements PsychologistService {
                     psychologistDTO.setDay((psychologist.getDays()));
                     psychologistDTO.setHours(((psychologist.getHours())));
 
-
+                    CalendarContentDTO calendarContentDTO = new CalendarContentDTO();
+                    calendarContentDTO.setContent(Collections.singletonList(psychologistDTO));
 
                     return psychologistDTO;
                 })
-                .collectList()
                 .map(list -> {
                     CalendarContentDTO contentDTO = new CalendarContentDTO();
-                    contentDTO.setContent(list); // may need casting if type mismatch
-                    contentDTO.setPrevKey(null); // or use pagination logic
-                    contentDTO.setNextKey(null);
-                    contentDTO.setCount(String.valueOf(list.size()));
+                    contentDTO.setContent(Collections.singletonList(list));
                     return contentDTO;
-                });
+                }).switchIfEmpty(Mono.error(new TypedResponseException(HttpStatus.NOT_FOUND,"Psychology", "Psychology id not found")));
     }
 
 }
