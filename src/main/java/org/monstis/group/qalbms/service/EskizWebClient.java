@@ -40,7 +40,7 @@ public class EskizWebClient {
 
     public Mono<EskizResponseDTO> register(String phone, String token, int otp) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        String appHash ="0Z7HCamduWZ";
+        String appHash ="yel85VbPOV6"
 
         formData.add("mobile_phone", phone);
         formData.add("message", "Qalb.uz ilovasida ro'yxatdan o'tish uchun kod: " + otp+"\n"+appHash);
