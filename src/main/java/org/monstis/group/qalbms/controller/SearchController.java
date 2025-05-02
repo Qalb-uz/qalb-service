@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -64,7 +66,7 @@ public class SearchController {
 
     @GetMapping("/get-session-dates")
     @Operation(summary = "search for psychologists", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<CalendarContentDTO> getCalendarDates(
+    public Mono<List<CalendarContentDTO>> getCalendarDates(
             ServerWebExchange exchange,
             @RequestParam("psychologist_id") String psychologistId
     ) {

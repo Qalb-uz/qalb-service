@@ -5,13 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalendarContentDTO {
-    private LocalDateTime day;
-    private List<LocalDateTime> hours;
+public class CardDTO {
+
+    private String pan;
+    private String expDate;
 }

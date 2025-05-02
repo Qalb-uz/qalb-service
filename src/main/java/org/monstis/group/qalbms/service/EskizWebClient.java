@@ -1,9 +1,7 @@
 package org.monstis.group.qalbms.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.dto.EskizResponseDTO;
 import org.monstis.group.qalbms.dto.EskizTokenDTO;
-import org.monstis.group.qalbms.utils.OtpGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

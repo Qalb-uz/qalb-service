@@ -1,16 +1,10 @@
 package org.monstis.group.qalbms.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.monstis.group.qalbms.enums.PsychologicalApproach;
-import org.monstis.group.qalbms.enums.PsychologicalIssue;
-
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor

@@ -1,23 +1,17 @@
 package org.monstis.group.qalbms.controller;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
-import org.monstis.group.qalbms.dto.TopicDTO;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.monstis.group.qalbms.utils.TypedResponseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

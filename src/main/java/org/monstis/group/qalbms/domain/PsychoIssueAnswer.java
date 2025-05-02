@@ -1,14 +1,11 @@
 package org.monstis.group.qalbms.domain;
 
-import jakarta.json.Json;
-import lombok.*;
-import org.monstis.group.qalbms.dto.PsychoIssueAnswerDTO;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 @Table("client_application")
 @Data

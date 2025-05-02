@@ -1,6 +1,5 @@
 package org.monstis.group.qalbms.impl;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.domain.Psychologist;
 import org.monstis.group.qalbms.dto.*;
@@ -9,18 +8,15 @@ import org.monstis.group.qalbms.enums.PsychologicalIssue;
 import org.monstis.group.qalbms.repository.ElasticSearchRepository;
 import org.monstis.group.qalbms.service.PsychologistService;
 import org.monstis.group.qalbms.utils.TypedResponseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -168,35 +164,30 @@ public class PsychologsImpl implements PsychologistService {
                 });
     }
     @Override
-    public Mono<CalendarContentDTO> findByPsychologId( String psychologistId) {
+    public Mono<List<CalendarContentDTO>> findByPsychologId(String psychologistId) {
         return elasticSearchRepository.findById(psychologistId)
                 .map(psychologist -> {
-                    SessionCalendar psychologistDTO = new SessionCalendar();
+                    List<LocalDateTime> hours = psychologist.getHours(); // assume this returns List<LocalDateTime>
 
-                    TherapistDTO therapistDTO = new TherapistDTO();
+                    // Group by date (day-only), using midnight to represent the day key
+                    Map<LocalDateTime, List<LocalDateTime>> grouped = hours.stream()
+                            .collect(Collectors.groupingBy(hour -> hour.toLocalDate().atStartOfDay()));
 
-                    therapistDTO.setDays(psychologist.getDays());
-                    therapistDTO.setHours(psychologist.getHours());
-                    AdditionalInfoDTO additionalInfoDTO = new AdditionalInfoDTO();
-                    additionalInfoDTO.setSubtitle(psychologist.getAdditionalInfoSubtitle());
-                    additionalInfoDTO.setTitle(psychologist.getAdditionalInfoTitle());
-
-
-
-                    psychologistDTO.setDay((psychologist.getDays()));
-                    psychologistDTO.setHours(((psychologist.getHours())));
-
-                    CalendarContentDTO calendarContentDTO = new CalendarContentDTO();
-                    calendarContentDTO.setContent(Collections.singletonList(psychologistDTO));
-
-                    return psychologistDTO;
+                    // Convert each group into CalendarContentDTO
+                    return grouped.entrySet().stream()
+                            .map(entry -> {
+                                CalendarContentDTO dto = new CalendarContentDTO();
+                                dto.setDay(entry.getKey()); // the "day"
+                                dto.setHours(entry.getValue()); // the "hours"
+                                return dto;
+                            })
+                            .collect(Collectors.toList());
                 })
-                .map(list -> {
-                    CalendarContentDTO contentDTO = new CalendarContentDTO();
-                    contentDTO.setContent(Collections.singletonList(list));
-                    return contentDTO;
-                }).switchIfEmpty(Mono.error(new TypedResponseException(HttpStatus.NOT_FOUND,"Psychology", "Psychology id not found")));
+                .switchIfEmpty(Mono.error(new TypedResponseException(
+                        HttpStatus.NOT_FOUND, "Psychology", "Psychology id not found")));
     }
+
+
 
 }
 

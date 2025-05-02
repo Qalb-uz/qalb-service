@@ -8,6 +8,8 @@ import org.monstis.group.qalbms.dto.PsychologistDTO;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Service
 public interface PsychologistService {
 
@@ -15,5 +17,5 @@ public interface PsychologistService {
 
     Mono<ContentDTO>getAllPsychologyist(Integer size, Integer key);
 
-    Mono<CalendarContentDTO> findByPsychologId(String psychologId);
+    Mono<List<CalendarContentDTO>> findByPsychologId(String psychologId);
 }

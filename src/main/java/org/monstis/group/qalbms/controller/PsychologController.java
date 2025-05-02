@@ -6,11 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.monstis.group.qalbms.domain.Psychologist;
 import org.monstis.group.qalbms.dto.ContentDTO;
-import org.monstis.group.qalbms.dto.ContentForAllDTO;
 import org.monstis.group.qalbms.dto.PsychologistDTO;
 import org.monstis.group.qalbms.service.PsychologistService;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 

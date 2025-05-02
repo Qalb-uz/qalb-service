@@ -3,7 +3,6 @@ package org.monstis.group.qalbms.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.r2dbc.postgresql.codec.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
@@ -16,10 +15,8 @@ import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController

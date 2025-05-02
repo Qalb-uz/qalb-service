@@ -1,19 +1,14 @@
 package org.monstis.group.qalbms.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
-import org.monstis.group.qalbms.enums.PsychologicalApproach;
-import org.monstis.group.qalbms.enums.PsychologicalIssue;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 
 
 @Data
