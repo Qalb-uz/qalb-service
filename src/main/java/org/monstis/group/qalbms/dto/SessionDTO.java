@@ -15,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SessionDTO {
 
+    private Integer session_id=1;
     private LocalDateTime time = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
     private String therapistId="ByQHVpYBTeEC6r8p5ca2";
 

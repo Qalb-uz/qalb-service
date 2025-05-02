@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.domain.Card;
 import org.monstis.group.qalbms.dto.CardDTO;
+import org.monstis.group.qalbms.dto.PageTwoDTO;
+import org.monstis.group.qalbms.dto.PaymentDTO;
 import org.monstis.group.qalbms.repository.CardRepository;
 import org.monstis.group.qalbms.service.AuthService;
 import org.monstis.group.qalbms.service.CardService;
@@ -64,11 +66,17 @@ public class PaymentsController {
 
   @PostMapping("check-promo")
   @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<?> checkPromo(@RequestParam("promoCode") String promoCode,@RequestParam("serviceId") String serviceId, ServerWebExchange serverWebExchange) {
+    public Mono<?> checkPromo(@RequestParam("promoCode") String promoCode,@RequestParam("serviceName") String serviceId,@RequestParam("session_id") String session_id, ServerWebExchange serverWebExchange) {
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         return promoService.validatePromoCode(promoCode, jwtUtil.extractUsername(token),serviceId);
 
+    }
+    @PostMapping("payment")
+    @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
+    public Mono<PaymentDTO>makePayment(@RequestParam("card_id")String card_id, @RequestParam("session_id")String session_id){
+        PaymentDTO paymentDTO = new PaymentDTO();
+        return Mono.just(paymentDTO);
     }
 
 }
