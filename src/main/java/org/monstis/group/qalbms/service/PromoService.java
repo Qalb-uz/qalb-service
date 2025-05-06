@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
 @Service
 public interface PromoService {
 
-    Mono<?> validatePromoCode(String promoCode, String username,String serviceId);
+    Mono<?> validatePromoCode(String promoCode, String username,String therapistId);
 }

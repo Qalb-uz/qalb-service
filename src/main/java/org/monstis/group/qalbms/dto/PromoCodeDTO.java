@@ -1,6 +1,5 @@
 package org.monstis.group.qalbms.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentDTO {
+public class PromoCodeDTO {
 
-    @JsonProperty("session_id")
-   private String sessionId;
-    @JsonProperty("card_id")
-    private String  cardId;
+    private String promo_code;
+    @JsonProperty("therapist_id")
+    private String therapistId;
 }

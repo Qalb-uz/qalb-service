@@ -5,14 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SessionDTO {
+public class SessionTopicDTO {
     private String id;
     private String sessionFor;
     private String price;
     private String time;
+    private List<TopicDTO> topic;
 
     @JsonIgnore
     private String username;

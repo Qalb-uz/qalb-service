@@ -39,8 +39,8 @@ public class PromoCode {
     @Column("first_order_only")
     private Boolean firstOrderOnly;
 
-    @Column("allowed_services") // Stored as comma-separated string
-    private String allowedServices; // e.g., "therapy,coaching"
+    @Column("allowed_therapist_id") // Stored as comma-separated string
+    private String allowedTherapistId; // e.g., "therapy,coaching"
 
     @Column("usage_limit")
     private Integer usageLimit;
@@ -60,6 +60,6 @@ public class PromoCode {
 
     // Add convenience method if needed to split allowedServices
     public List<String> getAllowedServicesList() {
-        return allowedServices != null ? List.of(allowedServices.split(",")) : List.of();
+        return allowedTherapistId != null ? List.of(allowedTherapistId.split(",")) : List.of();
     }
 }

@@ -2,6 +2,7 @@ package org.monstis.group.qalbms.impl;
 
 
 import org.monstis.group.qalbms.domain.PromoCode;
+import org.monstis.group.qalbms.dto.PromoCodeResponseDTO;
 import org.monstis.group.qalbms.enums.PromoCodeErrorType;
 import org.monstis.group.qalbms.repository.PromoCodeRepository;
 import org.monstis.group.qalbms.repository.PromoCodeUsageRepository;
@@ -24,18 +25,23 @@ public class PromoCodeServiceImpl implements PromoService {
         this.userService = userService;
     }
 
-    public Mono<PromoCode> validatePromoCode(String promoCode, String userId, String serviceId) {
+    public Mono<PromoCodeResponseDTO> validatePromoCode(String promoCode, String userId, String serviceId) {
         return promoCodeRepository.findByCode(promoCode)
                 .switchIfEmpty(Mono.error(new TypedResponseException(
                         HttpStatus.NOT_FOUND,
-                        PromoCodeErrorType.NOT_FOUND.name(),
+                        PromoCodeErrorType.PROMOCODE.name(),
                         "Промокод не найден"
                 )))
                 .flatMap(code -> {
+                    PromoCodeResponseDTO responseDTO = new PromoCodeResponseDTO();
+
+                    responseDTO.setCode(code.getCode());
+                    responseDTO.setDescription(code.getDescription());
+                    responseDTO.setId(String.valueOf(code.getId()));
                     if (code.isExpired()) {
                         return Mono.error(new TypedResponseException(
                                 HttpStatus.BAD_REQUEST,
-                                PromoCodeErrorType.EXPIRED.name(),
+                                PromoCodeErrorType.PROMOCODE.name(),
                                 "Срок действия промокода истёк"
                         ));
                     }
@@ -45,7 +51,7 @@ public class PromoCodeServiceImpl implements PromoService {
                                 if (code.getUsagePerUserLimit() != null && usageCount >= code.getUsagePerUserLimit()) {
                                     return Mono.error(new TypedResponseException(
                                             HttpStatus.BAD_REQUEST,
-                                            PromoCodeErrorType.ALREADY_USED.name(),
+                                            PromoCodeErrorType.PROMOCODE.name(),
                                             "Этот промокод уже использован"
                                     ));
                                 }
@@ -53,7 +59,7 @@ public class PromoCodeServiceImpl implements PromoService {
                                 if (!code.getAllowedServicesList().contains(serviceId)) {
                                     return Mono.error(new TypedResponseException(
                                             HttpStatus.BAD_REQUEST,
-                                            PromoCodeErrorType.INVALID_FOR_SERVICE.name(),
+                                            PromoCodeErrorType.PROMOCODE.name(),
                                             "Промокод нельзя применить к выбранной услуге"
                                     ));
                                 }
@@ -64,16 +70,18 @@ public class PromoCodeServiceImpl implements PromoService {
                                                 if (!isFirst) {
                                                     return Mono.error(new TypedResponseException(
                                                             HttpStatus.BAD_REQUEST,
-                                                            PromoCodeErrorType.FIRST_ORDER_ONLY.name(),
+                                                            PromoCodeErrorType.PROMOCODE.name(),
                                                             "Этот промокод можно использовать только при первом заказе"
                                                     ));
                                                 }
-                                                return Mono.just(code); // Promo is valid
+                                                return Mono.just(responseDTO); // Promo is valid
                                             });
                                 }
 
-                                return Mono.just(code); // Promo is valid
+
+                                return Mono.just(responseDTO); // Promo is valid
                             });
+
                 })
                 .onErrorResume(e -> {
                     if (e instanceof TypedResponseException) {

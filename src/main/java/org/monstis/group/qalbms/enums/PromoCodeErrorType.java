@@ -7,5 +7,6 @@ public enum PromoCodeErrorType {
     INVALID_FOR_SERVICE,
     FIRST_ORDER_ONLY,
     VERIFY_FAILED,
-    TOO_MANY_ATTEMPTS
+    TOO_MANY_ATTEMPTS,
+    PROMOCODE,
 }

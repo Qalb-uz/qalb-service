@@ -5,6 +5,7 @@ import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
 import org.monstis.group.qalbms.dto.TopicDTO;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -15,4 +16,6 @@ public interface ApplicationRepository extends ReactiveCrudRepository<PsychoIssu
     Mono<PsychoIssueAnswer>save(TopicDTO topicDTO);
 
     Mono<Boolean>deleteByUsername(String username);
+
+    Flux<PsychoIssueAnswer>findAllByUsername(String username);
 }

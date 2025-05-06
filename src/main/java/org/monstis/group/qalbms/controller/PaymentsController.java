@@ -7,15 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.domain.Card;
 import org.monstis.group.qalbms.dto.CardDTO;
-import org.monstis.group.qalbms.dto.PageTwoDTO;
 import org.monstis.group.qalbms.dto.PaymentDTO;
+import org.monstis.group.qalbms.dto.PaymentResponseDTO;
+import org.monstis.group.qalbms.dto.PromoCodeDTO;
 import org.monstis.group.qalbms.repository.CardRepository;
 import org.monstis.group.qalbms.service.AuthService;
 import org.monstis.group.qalbms.service.CardService;
+import org.monstis.group.qalbms.service.PaymentService;
 import org.monstis.group.qalbms.service.PromoService;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -29,17 +32,19 @@ public class PaymentsController {
     private  final AuthService authService;
     private final CardRepository cardRepository;
     private final PromoService promoService;
+    private final PaymentService paymentService;
 
-    public PaymentsController(CardService cardService, JwtUtil jwtUtil, AuthService authService, CardRepository cardRepository, PromoService promoService) {
+    public PaymentsController(CardService cardService, JwtUtil jwtUtil, AuthService authService, CardRepository cardRepository, PromoService promoService, PaymentService paymentService) {
         this.cardService = cardService;
         this.jwtUtil = jwtUtil;
         this.authService = authService;
         this.cardRepository = cardRepository;
         this.promoService = promoService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("add/card")
-    public Mono<?>addCard(@RequestBody CardDTO card, ServerWebExchange exchange){
+    public Flux<?>addCard(@RequestBody CardDTO card, ServerWebExchange exchange){
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         String username=jwtUtil.extractUsername(token);
@@ -49,34 +54,38 @@ public class PaymentsController {
     }
     @PostMapping("/verify-card-otp")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<Card> verifyOtp(@RequestParam("otp") String otp,ServerWebExchange serverWebExchange) {
+    public Flux<Card> verifyOtp(@RequestParam("otp") String otp,ServerWebExchange serverWebExchange) {
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
 
         return authService.verifyOtp(otp, jwtUtil.extractUsername(token), jwtUtil.extractDeviceName(token), jwtUtil.extractDeviceId(token))
-                .flatMap(verifyDTO -> cardRepository.findByCardPhoneNumber(jwtUtil.extractUsername(token)));
+                .thenMany(verifyDTO -> cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token)));
     }
+
     @GetMapping("/get-cards")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<Card>getClientAllCards(ServerWebExchange serverWebExchange){
+    public Flux<Card>getClientAllCards(ServerWebExchange serverWebExchange){
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
-        return cardRepository.findByCardPhoneNumber(jwtUtil.extractUsername(token));
+        return cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token));
     }
 
   @PostMapping("check-promo")
   @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<?> checkPromo(@RequestParam("promoCode") String promoCode,@RequestParam("serviceName") String serviceId,@RequestParam("session_id") String session_id, ServerWebExchange serverWebExchange) {
+    public Mono<?> checkPromo(@RequestBody PromoCodeDTO promoCodeDTO,ServerWebExchange serverWebExchange) {
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
-        return promoService.validatePromoCode(promoCode, jwtUtil.extractUsername(token),serviceId);
+        return promoService.validatePromoCode(promoCodeDTO.getPromo_code(), jwtUtil.extractUsername(token), promoCodeDTO.getTherapistId());
 
     }
     @PostMapping("payment")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<PaymentDTO>makePayment(@RequestParam("card_id")String card_id, @RequestParam("session_id")String session_id){
-        PaymentDTO paymentDTO = new PaymentDTO();
-        return Mono.just(paymentDTO);
+    public Mono<PaymentResponseDTO>makePayment(@RequestBody PaymentDTO paymentDTO, ServerWebExchange serverWebExchange){
+        String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String token = authHeader.substring(7);
+        String username=jwtUtil.extractUsername(token);
+        return paymentService.createPayment(paymentDTO,username);
+
     }
 
 }

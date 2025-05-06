@@ -8,6 +8,7 @@ import org.monstis.group.qalbms.service.CardService;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -23,8 +24,8 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Mono<OtpResponse> addCard(CardDTO cardDTO, String username, String token) {
-        return cardRepository.findByCardPhoneNumber(username)
+    public Flux<OtpResponse> addCard(CardDTO cardDTO, String username, String token) {
+        return cardRepository.findAllByCardPhoneNumber(username)
                 .flatMap(cardOld -> {
                     // Card exists, just send OTP
                     return authImpl.registerPhone(
@@ -42,13 +43,13 @@ public class CardServiceImpl implements CardService {
 
                     if (cardDTO.getPan().startsWith("9860")) {
                         card.setCardBrand("HUMO");
-                        card.setCardLogo("https://humocard.uz/bitrix/templates/main/img/logo2.png");
+                        card.setCardLogo("https://github.com/Qalb-uz/qalb-service/blob/main/Type%3DHumo.png?raw=true");
                     } else if (cardDTO.getPan().startsWith("8600")) {
                         card.setCardBrand("UZCARD");
-                        card.setCardLogo("https://img.hhcdn.ru/employer-logo/3595932.png");
+                        card.setCardLogo("https://github.com/Qalb-uz/qalb-service/blob/main/Type%3DUzCard.png?raw=true");
                     } else {
                         card.setCardBrand("UNKNOWN");
-                        card.setCardLogo("https://example.com/default-logo.png");
+                        card.setCardLogo("https://github.com/Qalb-uz/qalb-service/blob/main/Type%3DInstallment.png?raw=true");
                     }
 
                     return cardRepository.save(card)
