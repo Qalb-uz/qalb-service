@@ -56,7 +56,7 @@ public class PaymentsController {
     }
     @PostMapping("/verify-card-otp")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<List<Card>> verifyOtp(@RequestParam("otp") String otp, ServerWebExchange serverWebExchange) {
+    public Mono<Card> verifyOtp(@RequestParam("otp") String otp, ServerWebExchange serverWebExchange) {
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
 
@@ -66,7 +66,7 @@ public class PaymentsController {
 
     @GetMapping("/get-cards")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<List<Card>>getClientAllCards(ServerWebExchange serverWebExchange){
+    public Mono<Card>getClientAllCards(ServerWebExchange serverWebExchange){
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         return cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token));
