@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface CardRepository extends R2dbcRepository<Card, Long> {
-    Flux<Card> findAllByCardPhoneNumber(String cardPhoneNumber);
+    Mono<List<Card>> findAllByCardPhoneNumber(String cardPhoneNumber);
 
     Mono<Card>findById(Long cardId);
 

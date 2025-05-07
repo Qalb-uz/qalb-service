@@ -32,7 +32,7 @@ public class SessionController {
         this.sessionRepository = sessionRepository;
     }
 
-
+//todo check therpist time if that time is seleccted show error
     @PostMapping("/create-session")
     public Mono<SessionResponseDto> createSession(@RequestBody SessionRequestDTO session, ServerWebExchange serverWebExchange) {
 

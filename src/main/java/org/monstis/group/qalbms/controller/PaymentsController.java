@@ -21,6 +21,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api")
 @Slf4j
@@ -44,7 +46,7 @@ public class PaymentsController {
     }
 
     @PostMapping("add/card")
-    public Flux<?>addCard(@RequestBody CardDTO card, ServerWebExchange exchange){
+    public Mono<?>addCard(@RequestBody CardDTO card, ServerWebExchange exchange){
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         String username=jwtUtil.extractUsername(token);
@@ -54,17 +56,17 @@ public class PaymentsController {
     }
     @PostMapping("/verify-card-otp")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Flux<Card> verifyOtp(@RequestParam("otp") String otp,ServerWebExchange serverWebExchange) {
+    public Mono<List<Card>> verifyOtp(@RequestParam("otp") String otp, ServerWebExchange serverWebExchange) {
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
 
         return authService.verifyOtp(otp, jwtUtil.extractUsername(token), jwtUtil.extractDeviceName(token), jwtUtil.extractDeviceId(token))
-                .thenMany(verifyDTO -> cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token)));
+                .flatMap(verifyDTO -> cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token)));
     }
 
     @GetMapping("/get-cards")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Flux<Card>getClientAllCards(ServerWebExchange serverWebExchange){
+    public Mono<List<Card>>getClientAllCards(ServerWebExchange serverWebExchange){
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         return cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token));

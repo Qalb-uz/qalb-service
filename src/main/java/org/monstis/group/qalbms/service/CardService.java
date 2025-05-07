@@ -9,5 +9,5 @@ import reactor.core.publisher.Mono;
 @Service
 public interface CardService {
 
-    Flux<?> addCard(CardDTO cardDTO, String  username, String token);
+    Mono<?> addCard(CardDTO cardDTO, String  username, String token);
 }

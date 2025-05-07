@@ -17,12 +17,12 @@ public class GlobalExceptionHandler {
     private static final String UNKNOWN_EXCEPTION_TYPE = "unknown";
     private static final String AUTH_EXCEPTION_TYPE = "auth";
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public CommonResponse serverExceptionHandler(Exception ex) {
-        log.error(ex.getMessage(), ex);
-        return new CommonResponse(new Cause(UNKNOWN_EXCEPTION_TYPE, ex.getMessage()), false);
-    }
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public CommonResponse serverExceptionHandler(Exception ex) {
+//        log.error(ex.getMessage(), ex);
+//        return new CommonResponse(new Cause(UNKNOWN_EXCEPTION_TYPE, ex.getMessage()), false);
+//    }
 
 
     @ExceptionHandler(TypedResponseException.class)

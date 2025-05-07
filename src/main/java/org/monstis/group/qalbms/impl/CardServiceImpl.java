@@ -24,7 +24,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Flux<OtpResponse> addCard(CardDTO cardDTO, String username, String token) {
+    public Mono<OtpResponse> addCard(CardDTO cardDTO, String username, String token) {
         return cardRepository.findAllByCardPhoneNumber(username)
                 .flatMap(cardOld -> {
                     // Card exists, just send OTP
@@ -43,13 +43,13 @@ public class CardServiceImpl implements CardService {
 
                     if (cardDTO.getPan().startsWith("9860")) {
                         card.setCardBrand("HUMO");
-                        card.setCardLogo("https://github.com/Qalb-uz/qalb-service/blob/main/Type%3DHumo.png?raw=true");
+                        card.setCardLogo("https://humocard.uz/bitrix/templates/main/img/logo2.png");
                     } else if (cardDTO.getPan().startsWith("8600")) {
                         card.setCardBrand("UZCARD");
-                        card.setCardLogo("https://github.com/Qalb-uz/qalb-service/blob/main/Type%3DUzCard.png?raw=true");
+                        card.setCardLogo("https://img.hhcdn.ru/employer-logo/3595932.png");
                     } else {
                         card.setCardBrand("UNKNOWN");
-                        card.setCardLogo("https://github.com/Qalb-uz/qalb-service/blob/main/Type%3DInstallment.png?raw=true");
+                        card.setCardLogo("https://example.com/default-logo.png");
                     }
 
                     return cardRepository.save(card)
@@ -62,6 +62,7 @@ public class CardServiceImpl implements CardService {
                             );
                 }));
     }
+
 
 
 

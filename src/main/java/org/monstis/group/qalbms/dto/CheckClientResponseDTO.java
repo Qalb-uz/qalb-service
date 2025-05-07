@@ -31,7 +31,7 @@ public class CheckClientResponseDTO {
     private String sessionFor;
 
     private String username;
-    private List<CheckClientSubTopicDTO> subtopic;
+    private List<CheckClientSubTopicDTO> topics;
     private String cost;
     private String title;
 

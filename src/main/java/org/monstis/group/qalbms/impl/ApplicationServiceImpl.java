@@ -58,7 +58,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                         }
                     }
 
-                    responseDTO.setSubtopic(topics);
+                    responseDTO.setTopics(topics);
                     return Mono.just(responseDTO);
                 })
                 .switchIfEmpty(Mono.error(new TypedResponseException(
