@@ -4,7 +4,9 @@ package org.monstis.group.qalbms.controller;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.monstis.group.qalbms.domain.PsychoIssueAnswer;
+import org.monstis.group.qalbms.dto.CheckClientResponseDTO;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
+import org.monstis.group.qalbms.service.ApplicationService;
 import org.monstis.group.qalbms.utils.JwtUtil;
 import org.monstis.group.qalbms.utils.TypedResponseException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class ApplicationController {
 
     private final ApplicationRepository applicationRepository;
     private final JwtUtil jwtUtil;
+    private final ApplicationService applicationService;
 
     @PostMapping("/send")
     public Mono<PsychoIssueAnswer> saveAnswers(@RequestBody List<PsychoIssueAnswer> topicsList, ServerWebExchange exchange) {
@@ -39,16 +42,11 @@ public class ApplicationController {
     }
 
     @GetMapping("check-client-application")
-    public Mono<?> checkClientApplication(ServerWebExchange exchange) {
+    public Mono<CheckClientResponseDTO> checkClientApplication(ServerWebExchange exchange) {
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             String token = authHeader.substring(7);
-             return applicationRepository.findFirstByUsername(jwtUtil.extractUsername(token)).flatMap(psychoIssueAnswer -> {
-                if(psychoIssueAnswer.isValid())
-                {
-                    return Mono.just(psychoIssueAnswer);
-                }
-           return Mono.just((psychoIssueAnswer));
-       }).switchIfEmpty(Mono.error(new TypedResponseException(HttpStatus.NOT_FOUND,"RESUME", "Client resume not found")));
+             return applicationService.checkApplication(jwtUtil.extractUsername(token));
+
 
     }
 
@@ -56,5 +54,10 @@ public class ApplicationController {
 //    public Mono<?>editClientApplication(@RequestBody TopicDTO topicsFlux) {
 //        return applicationRepository.save(topicsFlux);
 //    }
+
+
+
+
+
 
 } 

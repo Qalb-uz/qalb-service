@@ -31,7 +31,7 @@ public class PsychoIssueAnswer {
 
     private String cost;
     private String title;
-    @Column("sub_topics")
+    @Column("sub_topic")
     private String subtopics;
 
 

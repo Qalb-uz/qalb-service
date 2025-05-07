@@ -12,5 +12,5 @@ import java.util.List;
 public class PageThreeDTO {
     private Long id;
     private String title;
-    private List<SubtopicDTO> subtopic;
+    private List<SubtopicDTO> subtopics;
 }
