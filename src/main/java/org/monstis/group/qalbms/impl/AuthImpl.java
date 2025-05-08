@@ -4,12 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.monstis.group.qalbms.domain.Auth;
 import org.monstis.group.qalbms.domain.Client;
+import org.monstis.group.qalbms.domain.Device;
 import org.monstis.group.qalbms.dto.OtpResponse;
 import org.monstis.group.qalbms.dto.TokenResponse;
 import org.monstis.group.qalbms.dto.VerifyDTO;
 import org.monstis.group.qalbms.repository.ApplicationRepository;
 import org.monstis.group.qalbms.repository.AuthRepository;
 import org.monstis.group.qalbms.repository.ClientRepository;
+import org.monstis.group.qalbms.repository.DeviceRepository;
 import org.monstis.group.qalbms.service.AuthService;
 import org.monstis.group.qalbms.service.EskizWebClient;
 import org.monstis.group.qalbms.service.KeycloakService;
@@ -41,11 +43,12 @@ public class AuthImpl implements AuthService {
    private final ApplicationRepository applicationRepository;
    private final JwtUtil jwtUtil;
    private final ClientRepository clientRepository;
+   private final DeviceRepository deviceRepository;
 
    @Value("${eskiz.username.token}")
    private String eskizUsernameToken;
 
-    public AuthImpl(UzbekistanPhoneNumberValidator uzbPhoneNumberValidator, EskizWebClient eskizWebClient, TokenCacherService tokenCacherService, OtpGenerator otpGenerator, AuthRepository authRepository, KeycloakService keycloakService, ApplicationRepository applicationRepository, JwtUtil jwtUtil, ClientRepository clientRepository) {
+    public AuthImpl(UzbekistanPhoneNumberValidator uzbPhoneNumberValidator, EskizWebClient eskizWebClient, TokenCacherService tokenCacherService, OtpGenerator otpGenerator, AuthRepository authRepository, KeycloakService keycloakService, ApplicationRepository applicationRepository, JwtUtil jwtUtil, ClientRepository clientRepository, DeviceRepository deviceRepository) {
         this.uzbPhoneNumberValidator = uzbPhoneNumberValidator;
         this.eskizWebClient = eskizWebClient;
         this.tokenCacherService = tokenCacherService;
@@ -55,6 +58,7 @@ public class AuthImpl implements AuthService {
         this.applicationRepository = applicationRepository;
         this.jwtUtil = jwtUtil;
         this.clientRepository = clientRepository;
+        this.deviceRepository = deviceRepository;
     }
 
 
@@ -143,15 +147,26 @@ public class AuthImpl implements AuthService {
                                     client.setDeviceId(deviceId);
                                     client.setFirstLoginAt(Instant.now());
                                     client.setResumeStatus(String.valueOf(VerifyDTO.ResumeStatus.INVALID));
-                                    return clientRepository.save(client);
+                                    Device device = new Device();
+                                    device.setPhoneNumber(phone);
+                                    device.setDeviceId(deviceId);
+                                    device.setDeviceName(deviceName);
+                                    device.setCreatedAt(Instant.now());
+                                    return deviceRepository.save(device).flatMap(device1 -> clientRepository.save(client));
                                 })).flatMap(exClient -> {
+                                    Device device = new Device();
+                                    device.setPhoneNumber(phone);
+                                    device.setDeviceId(deviceId);
+                                    device.setDeviceName(deviceName);
+                                    device.setCreatedAt(Instant.now());
+
                                     exClient.setMsisdn(phone);
                                     exClient.setDeviceName(deviceName);
                                     exClient.setDeviceId(deviceId);
                                     exClient.setResumeStatus(String.valueOf(VerifyDTO.ResumeStatus.INVALID));
                                     exClient.setFirstLoginAt(Instant.now());
-                                    return clientRepository.save(exClient).flatMap(client1 -> authRepository.save(auth)
-                                            .flatMap(auth1 -> Mono.just(ResponseEntity.ok(new OtpResponse("OTP sent successfully", phone)))));
+                                    return deviceRepository.save(device).flatMap(device1 -> clientRepository.save(exClient).flatMap(client1 -> authRepository.save(auth)
+                                            .flatMap(auth1 -> Mono.just(ResponseEntity.ok(new OtpResponse("OTP sent successfully", phone))))));
                                 });
                             }
                             return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OtpResponse("OTP code expired", phone)));

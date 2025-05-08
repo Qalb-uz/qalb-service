@@ -61,12 +61,12 @@ public class PaymentsController {
         String token = authHeader.substring(7);
 
         return authService.verifyOtp(otp, jwtUtil.extractUsername(token), jwtUtil.extractDeviceName(token), jwtUtil.extractDeviceId(token))
-                .flatMap(verifyDTO -> cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token)));
+                .flatMap(verifyDTO -> cardRepository.findLastAddedByCardPhoneNumber(jwtUtil.extractUsername(token)));
     }
 
     @GetMapping("/get-cards")
     @Operation(summary = "verify otp code", description = "REQUIRED_ROLES: <b></b>")
-    public Mono<Card>getClientAllCards(ServerWebExchange serverWebExchange){
+    public Flux<Card>getClientAllCards(ServerWebExchange serverWebExchange){
         String authHeader = serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = authHeader.substring(7);
         return cardRepository.findAllByCardPhoneNumber(jwtUtil.extractUsername(token));
