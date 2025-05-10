@@ -40,9 +40,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                     responseDTO.setTheraphyLanguage(psychoIssueAnswer.getTheraphyLanguage());
                     responseDTO.setPsychoGender(psychoIssueAnswer.getPsychoGender());
                     responseDTO.setCost(psychoIssueAnswer.getCost());
-                    responseDTO.setTitle(psychoIssueAnswer.getTitle());
                     responseDTO.setUsername(psychoIssueAnswer.getUsername());
                     responseDTO.setSessionFor(psychoIssueAnswer.getSessionFor());
+                    responseDTO.setIsValid(psychoIssueAnswer.isValid());
 
                     List<CheckClientSubTopicDTO> topics = new ArrayList<>();
                     if (psychoIssueAnswer.isValid()) {

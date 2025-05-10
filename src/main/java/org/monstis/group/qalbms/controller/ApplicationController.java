@@ -50,14 +50,6 @@ public class ApplicationController {
 
     }
 
-//    @PutMapping("edit-client-application")
-//    public Mono<?>editClientApplication(@RequestBody TopicDTO topicsFlux) {
-//        return applicationRepository.save(topicsFlux);
-//    }
-
-
-
-
 
 
 } 

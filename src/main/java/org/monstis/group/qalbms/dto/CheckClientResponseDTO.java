@@ -33,7 +33,8 @@ public class CheckClientResponseDTO {
     private String username;
     private List<CheckClientSubTopicDTO> topics;
     private String cost;
-    private String title;
+    private Boolean  isValid;
+
 
 
 }
