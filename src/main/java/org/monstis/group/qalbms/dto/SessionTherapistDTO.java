@@ -12,5 +12,5 @@ public class SessionTherapistDTO {
     private String id;
     private String firstName;
     private String lastName;
-    private String img;
+    private String image;
 }
